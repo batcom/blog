@@ -1,0 +1,61 @@
+%title FastDfs的安装与配置
+==FastDfs的安装与配置==
+这个安装完全可以参考，[[../../server/fastdfs|FastDfs的安装与配置]],这里有详细的说明，而且建议即便是在Ubuntu平台下面安装也先参考一下这里的原理。
+----
+===需要注意的不同点===
+我们这里只将与上文中不同的地方，主要有两点：
+# 编译安装过程中的不同：
+    - 首先安装整个过程中所需要的包：sudo apt-get install libevent(这个默认就有，没有就装下) libevent-dev apache2-dev然后需要修改以下文件make.sh 这个根据实际情况来修改 ，因为如果不该默认会报找不到pthread类的错误
+    {{{class="brush :bash"
+    if [ -f /usr/lib/x86_64-linux-gnu/libpthread.so ] || [ -f /usr/local/lib/libpthread.so ] || [ -f /lib64/libpthread.so ] || [ -f /usr/lib64/libpthread.so ] || [ -f /usr/lib/x86_64-linux-gnu/libpthread.a ] || [ -f /usr/local/lib/libpthread.a ] || [ -f /lib64/libpthread.a ] || [ -f /usr/lib64/libpthread.a ]; then
+
+    #32为平台要改为
+    if [ -f /usr/lib/i386-linux-gnu/libpthread.so ] || [ -f /usr/local/lib/libpthread.so ] || [ -f /lib64/libpthread.so ] || [ -f /usr/lib64/libpthread.so ] || [ -f /usr/lib/i386-linux-gnu/libpthread.a ] || [ -f /usr/local/lib/libpthread.a ] || [ -f /lib64/libpthread.a ] || [ -f /usr/lib64/libpthread.a ]; then
+        }}}
+    - client/fdfs_link_library.sh.in `32`位平台也是修改为相应路径:
+    {{{class="brush :bash"
+if [ "`id -u`" = "0" ]; then
+  ln -fs $TARGET_LIB/libfastcommon.so.1 /usr/lib/x86_64-linux-gnu/libfastcommon.so
+  ln -fs $TARGET_LIB/libfdfsclient.so.1 /usr/lib/x86_64-linux-gnu/libfdfsclient.so
+
+  if [ "$OS_BITS" = "8" ]; then
+     ln -fs $TARGET_LIB/libfastcommon.so.1 /usr/lib/x86_64-linux-gnu/libfastcommon.so
+     ln -fs $TARGET_LIB/libfdfsclient.so.1 /usr/lib/x86_64-linux-gnu/libfdfsclient.so
+  fi
+fi
+    }}}
+    - 主要就是要保证这两个库能被找到，可以先find，然后修改对应路径即可，修改好了就可以按CentOS平台一样执行:`sh make.sh && sh make.sh install`了
+# 服务器为apache
+    - apache-fastdfs模块的安装:
+    {{{class="brush :bash"
+        tar zxf fastdfs-apache-module_v1.15.tar.gz
+        cd fastdfs-apache-module/src
+        #修改Makefile，我这里APACHE_BASE_PATH=/usr/share/apache2就可以了
+        #这里whereis查询相应的可执行文件路径，如果没有，cp一份过去都行，主要是会找不到build下面的special.mk,因为我的apache2是直接apt-get的
+        #所以这里需要apt-get install apache2-dev
+        #这里处理需要灵活，只要保证能找到文件就可以了
+        make && make install
+    }}}
+    - apache-fastdfs模块的配置:
+        {{{
+        安装完成后，会在/etc/fdfs下有一个mod_fastdfs.conf
+        vim /etc/fdfs/mod_fastdfs.conf
+        修改tracker_server = 192.168.1.88 这里为你的ip或者tracker的IP
+        修改url_hava_group_name = true
+        修改store_path0 = /data/fastdfs/store
+        然后就需要apache加载fastdfs模块，即加载.so文件
+        vim /etc/apache2/mods-enabled/fastdfs.load
+        LoadModule fastdfs_module /usr/lib/apache2/modules/mod_fastdfs.so
+        设置apache的文件匹配
+        vim /etc/apache2/apache2.conf
+        在Include port.conf后面加入
+        Include fastdfs.conf
+        vim /etc/apache2/fastdfs.conf
+        写入
+        <Location /group1/M00>
+        sethandler fastdfs
+        </Location>
+        保存即可。
+        重启apache
+        }}}
+----

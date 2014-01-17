@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Ruchee的Vim配置文件</title>
+<meta name="Generator" content="Vim/7.4">
+<meta name="plugin-version" content="vim7.4_v1">
+<meta name="syntax" content="vim">
+<meta name="settings" content="use_css,pre_wrap,no_foldcolumn,expand_tabs,prevent_copy=">
+<meta name="colorscheme" content="molokai">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #f8f8f2; background-color: #1b1d1e; }
+body { font-family: monospace; color: #f8f8f2; background-color: #1b1d1e; }
+* { font-size: 13px; }
+.Operator { color: #f92672; }
+.PreProc { color: #a6e22e; }
+.Delimiter { color: #8f8f8f; }
+.Function { color: #a6e22e; }
+.Identifier { color: #fd971f; }
+.Special { color: #66d9ef; background-color: #1b1d1e; padding-bottom: 1px; font-style: italic; }
+.Statement { color: #f92672; font-weight: bold; }
+.Type { color: #66d9ef; }
+.Comment { color: #465457; }
+.Number { color: #ae81ff; }
+.String { color: #e6db74; }
+-->
+</style>
+
+<script type='text/javascript'>
+<!--
+
+-->
+</script>
+</head>
+<body>
+<pre id='vimCodeElement'>
+<span class="Comment">&quot; -----------------   Author: Ruchee</span>
+<span class="Comment">&quot; -----------------    Email: my@ruchee.com</span>
+<span class="Comment">&quot; -----------------  WebSite: <a href="http://www.ruchee.com">http://www.ruchee.com</a></span>
+<span class="Comment">&quot; -----------------     Date: 2013-11-12 11:38</span>
+<span class="Comment">&quot; -----------------     For Windows, Cygwin and Linux</span>
+<span class="Comment">&quot; -----------------  <a href="https://github.com/ruchee/vim">https://github.com/ruchee/vim</a></span>
+
+
+<span class="Comment">&quot; 设置工作地点标志（在公司为1，在家为0）</span>
+<span class="Comment">&quot; 根据 D 盘根目录下有无 atCompany.txt 文件判断，Linux 下可类比创建</span>
+<span class="Statement">if</span> <span class="Function">filereadable</span><span class="Delimiter">(</span><span class="String">&quot;D:/atCompany.txt&quot;</span><span class="Delimiter">)</span>
+    <span class="Statement">let</span> <span class="Identifier">g:atCompany</span> <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">g:atCompany</span> <span class="Operator">=</span> <span class="Number">0</span>
+<span class="Statement">endif</span>
+
+
+<span class="Comment">&quot; 设置头文件和tags路径，用于代码补全</span>
+<span class="Statement">if</span> <span class="Identifier">g:atCompany</span>
+<span class="Comment">    &quot; set tags+=D:/Ruchee/workspace/common/tags</span>
+<span class="Comment">    &quot; set path+=D:/Ruchee/MinGW/include</span>
+<span class="Statement">else</span>
+<span class="Comment">    &quot; set path+=D:/Develop/MinGW/include</span>
+<span class="Statement">endif</span>
+
+
+
+<span class="Comment">&quot; ---------- Ctrl系按键 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Ctrl + H                   --光标移当前行行首       [插入模式]</span>
+<span class="Comment">&quot; Ctrl + J                   --光标移下一行行首       [插入模式]</span>
+<span class="Comment">&quot; Ctrl + K                   --光标移上一行行尾       [插入模式]</span>
+<span class="Comment">&quot; Ctrl + L                   --光标移当前行行尾       [插入模式]</span>
+
+<span class="Comment">&quot; ---------- Meta系按键 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Alt  + H                   --光标左移一格           [插入模式]</span>
+<span class="Comment">&quot; Alt  + J                   --光标下移一格           [插入模式]</span>
+<span class="Comment">&quot; Alt  + K                   --光标上移一格           [插入模式]</span>
+<span class="Comment">&quot; Alt  + L                   --光标右移一格           [插入模式]</span>
+
+<span class="Comment">&quot; ---------- Leader系按键 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \c[小写]                   --复制至公共剪贴板       [仅选择模式]</span>
+<span class="Comment">&quot; \a[小写]                   --复制所有至公共剪贴板   [Normal模式可用]</span>
+<span class="Comment">&quot; \v[小写]                   --从公共剪贴板粘贴       [全模式可用]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \T[大写]                   --一键加载语法模板       [全模式可用]</span>
+<span class="Comment">&quot; \R[大写]                   --源码一键编译运行       [全模式可用]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \rb                        --一键去除所有尾部空白   [全模式可用]</span>
+<span class="Comment">&quot; \rt                        --一键替换全部Tab为空格  [全模式可用]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \ww                        --打开Vimwiki主页</span>
+<span class="Comment">&quot; \wa                        --一键打开Vimwiki首页并编译所有源文件</span>
+<span class="Comment">&quot; \nt                        --打开NERDTree文件树窗口</span>
+<span class="Comment">&quot; \tl                        --打开/关闭TagList/TxtBrowser窗口</span>
+<span class="Comment">&quot; \ff                        --打开ctrlp.vim文件搜索窗口</span>
+<span class="Comment">&quot; \ig                        --显示/关闭对齐线</span>
+<span class="Comment">&quot; \bb                        --按=号对齐代码</span>
+<span class="Comment">&quot; \bn                        --自定义对齐</span>
+<span class="Comment">&quot; \th                        --一键生成与当前编辑文件同名的HTML文件 [不输出行号]</span>
+<span class="Comment">&quot; \ev                        --编辑当前所使用的Vim配置文件</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \cc                        --添加注释               [NERD_commenter]</span>
+<span class="Comment">&quot; \cu                        --取消注释               [NERD_commenter]</span>
+<span class="Comment">&quot; \cm                        --添加块注释             [NERD_commenter]</span>
+<span class="Comment">&quot; \cs                        --添加SexStyle块注释     [NERD_commenter]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; \16                        --以十六进制格式查看</span>
+<span class="Comment">&quot; \r16                       --返回普通格式</span>
+
+<span class="Comment">&quot; ---------- 补全命令 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Ctrl + P                   --单词补全               [插入模式]</span>
+<span class="Comment">&quot; Tab键                      --语法结构补全   [插入模式][snipMate插件]</span>
+<span class="Comment">&quot; Ctrl+Y+,                   --HTML标签补全  [插入模式][zencoding插件]</span>
+
+<span class="Comment">&quot; ---------- 格式化命令 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ==                         --缩进当前行</span>
+<span class="Comment">&quot; =G                         --缩进直到文件结尾</span>
+<span class="Comment">&quot; gg=G                       --缩进整个文件</span>
+<span class="Comment">&quot; 行号G=行号G                --缩进指定区间</span>
+
+<span class="Comment">&quot; u [小写]                   --单步复原               [非插入模式]</span>
+<span class="Comment">&quot; U [大写]                   --整行复原               [非插入模式]</span>
+<span class="Comment">&quot; Ctrl + R                   --撤消“撤消”操作         [非插入模式]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 查看命令 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Ctrl+G                     --显示当前文件和光标的粗略信息</span>
+<span class="Comment">&quot; g Ctrl+G                   --显示当前文件和光标的详细信息</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 搜索命令 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; #                          --向前搜索当前光标所在字符</span>
+<span class="Comment">&quot; *                          --向后搜索当前光标所在字符</span>
+<span class="Comment">&quot; ?                          --向前搜索</span>
+<span class="Comment">&quot; /                          --向后搜索</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 跳转命令 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Ctrl + ]                   --转到函数定义           [ctags跳转]</span>
+<span class="Comment">&quot; Ctrl + T                   --返回调用函数           [ctags跳转]</span>
+<span class="Comment">&quot; g Ctrl+]                   --列出可选跳转列表       [ctags跳转]</span>
+
+<span class="Comment">&quot; 0 or ^ or $                --跳至 行首 or 第一个非空字符 or 行尾</span>
+<span class="Comment">&quot; %                          --在匹配的括号间跳跃</span>
+<span class="Comment">&quot; { or }                     --按段落上/下跳跃</span>
+<span class="Comment">&quot; f字符                      --跳至从当前光标开始本行第一个指定字符出现的位置</span>
+<span class="Comment">&quot; gd                         --跳至当前光标所在单词首次出现的位置</span>
+<span class="Comment">&quot; gf                         --打开当前光标所在的文件名，如果确实存在该文件的话</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; [ Ctrl+D                   --跳至当前光标所在变量的首次定义位置 [从文件头部开始]</span>
+<span class="Comment">&quot; [ Ctrl+I                   --跳至当前光标所在变量的首次出现位置 [从文件头部开始]</span>
+<span class="Comment">&quot; [ D                        --列出当前光标所在变量的所有定义位置 [从文件头部开始]</span>
+<span class="Comment">&quot; [ I                        --列出当前光标所在变量的所有出现位置 [从文件头部开始]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 文本操作 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; dw de d0 d^ d$ dd          --删除</span>
+<span class="Comment">&quot; cw ce c0 c^ c$ cc          --删除并进入插入模式</span>
+<span class="Comment">&quot; yw ye y0 y^ y$ yy          --复制</span>
+<span class="Comment">&quot; vw ve v0 v^ v$ vv          --选中</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; di分隔符                   --删除指定分隔符之间的内容 [不包括分隔符]</span>
+<span class="Comment">&quot; ci分隔符                   --删除指定分隔符之间的内容并进入插入模式 [不包括分隔符]</span>
+<span class="Comment">&quot; yi分隔符                   --复制指定分隔符之间的内容 [不包括分隔符]</span>
+<span class="Comment">&quot; vi分隔符                   --选中指定分隔符之间的内容 [不包括分隔符]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; da分隔符                   --删除指定分隔符之间的内容 [包括分隔符]</span>
+<span class="Comment">&quot; ca分隔符                   --删除指定分隔符之间的内容并进入插入模式 [包括分隔符]</span>
+<span class="Comment">&quot; ya分隔符                   --复制指定分隔符之间的内容 [包括分隔符]</span>
+<span class="Comment">&quot; va分隔符                   --选中指定分隔符之间的内容 [包括分隔符]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Xi和Xa都可以在X后面加入一个数字，以指代所处理的括号层次</span>
+<span class="Comment">&quot; 如 d2i( 执行的是删除当前光标外围第二层括号内的所有内容</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; dt字符                     --删除本行内容，直到遇到第一个指定字符 [不包括该字符]</span>
+<span class="Comment">&quot; ct字符                     --删除本行内容，直到遇到第一个指定字符并进入插入模式 [不包括该字符]</span>
+<span class="Comment">&quot; yt字符                     --复制本行内容，直到遇到第一个指定字符 [不包括该字符]</span>
+<span class="Comment">&quot; vt字符                     --选中本行内容，直到遇到第一个指定字符 [不包括该字符]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; df字符                     --删除本行内容，直到遇到第一个指定字符 [包括该字符]</span>
+<span class="Comment">&quot; cf字符                     --删除本行内容，直到遇到第一个指定字符并进入插入模式 [包括该字符]</span>
+<span class="Comment">&quot; yf字符                     --复制本行内容，直到遇到第一个指定字符 [包括该字符]</span>
+<span class="Comment">&quot; vf字符                     --选中本行内容，直到遇到第一个指定字符 [包括该字符]</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; XT 和 XF 是 Xt/Xf 的反方向操作</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 便捷操作 ----------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; Ctrl + A                   --将当前光标所在数字自增1        [仅普通模式可用]</span>
+<span class="Comment">&quot; Ctrl + X                   --将当前光标所在数字自减1        [仅普通模式可用]</span>
+<span class="Comment">&quot; m字符       and '字符      --标记位置 and 跳转到标记位置</span>
+<span class="Comment">&quot; q字符 xxx q and @字符      --录制宏   and 执行宏</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- Vimwiki [Vim中的wiki/blog系统] ----------------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; 链接：[[链接地址|链接描述]]</span>
+<span class="Comment">&quot; 图片：{{图片地址||属性1=&quot;属性值&quot; 属性2=&quot;属性值&quot;}}</span>
+<span class="Comment">&quot; 代码：{{{class=&quot;brush: cpp&quot; 代码}}}</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; ---------- 其他常用内建命令 ------------------------------</span>
+<span class="Comment">&quot;</span>
+<span class="Comment">&quot; :se ff=unix                --更改文件格式，可选 unix、dos、mac</span>
+<span class="Comment">&quot; :se ft=cpp                 --更改文件语法着色模式</span>
+
+
+<span class="Comment">&quot; 判断操作系统类型</span>
+<span class="Statement">if</span><span class="Delimiter">(</span><span class="Function">has</span><span class="Delimiter">(</span><span class="String">&quot;win32&quot;</span><span class="Delimiter">)</span> <span class="Operator">||</span> <span class="Function">has</span><span class="Delimiter">(</span><span class="String">&quot;win64&quot;</span><span class="Delimiter">))</span>
+    <span class="Statement">let</span> <span class="Identifier">g:isWIN</span> <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">g:isWIN</span> <span class="Operator">=</span> <span class="Number">0</span>
+<span class="Statement">endif</span>
+
+<span class="Comment">&quot; 判断是否处于GUI界面</span>
+<span class="Statement">if</span> <span class="Function">has</span><span class="Delimiter">(</span><span class="String">&quot;gui_running&quot;</span><span class="Delimiter">)</span>
+    <span class="Statement">let</span> <span class="Identifier">g:isGUI</span> <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">g:isGUI</span> <span class="Operator">=</span> <span class="Number">0</span>
+<span class="Statement">endif</span>
+
+
+<span class="Comment">&quot; 设置通用缩进策略</span>
+<span class="Statement">set</span> <span class="PreProc">shiftwidth</span>=4
+<span class="Statement">set</span> <span class="PreProc">tabstop</span>=4
+
+<span class="Comment">&quot; 对部分语言设置单独的缩进</span>
+<span class="Statement">au</span> <span class="Type">FileType</span> lua,ruby,eruby,sh <span class="Statement">set</span> <span class="PreProc">shiftwidth</span>=2
+<span class="Statement">au</span> <span class="Type">FileType</span> lua,ruby,eruby,sh <span class="Statement">set</span> <span class="PreProc">tabstop</span>=2
+
+<span class="Comment">&quot; 根据后缀名指定文件类型</span>
+<span class="Statement">au</span> <span class="Type">BufRead</span>,<span class="Type">BufNewFile</span> *.h    <span class="Statement">setlocal</span> <span class="PreProc">ft</span>=c
+<span class="Statement">au</span> <span class="Type">BufRead</span>,<span class="Type">BufNewFile</span> *.wlua <span class="Statement">setlocal</span> <span class="PreProc">ft</span>=lua
+<span class="Statement">au</span> <span class="Type">BufRead</span>,<span class="Type">BufNewFile</span> *.sql  <span class="Statement">setlocal</span> <span class="PreProc">ft</span>=mysql
+<span class="Statement">au</span> <span class="Type">BufRead</span>,<span class="Type">BufNewFile</span> *.tpl  <span class="Statement">setlocal</span> <span class="PreProc">ft</span>=smarty
+<span class="Statement">au</span> <span class="Type">BufRead</span>,<span class="Type">BufNewFile</span> *.txt  <span class="Statement">setlocal</span> <span class="PreProc">ft</span>=txt
+
+
+<span class="Comment">&quot; 设置着色模式和字体</span>
+<span class="Statement">if</span> <span class="Identifier">g:isGUI</span>
+    <span class="Statement">colorscheme</span> molokai
+    <span class="Statement">set</span> <span class="PreProc">guifont</span>=Monaco<span class="Statement">:</span>h11
+<span class="Statement">else</span>
+    <span class="Statement">colorscheme</span> tango2
+    <span class="Statement">set</span> <span class="PreProc">guifont</span>=Monaco<span class="Statement">:</span>h11
+<span class="Statement">endif</span>
+
+
+<span class="Statement">set</span> <span class="PreProc">backspace</span>=2              <span class="Comment">&quot; 设置退格键可用</span>
+<span class="Statement">set</span> <span class="PreProc">autoindent</span>               <span class="Comment">&quot; 自动对齐</span>
+<span class="Statement">set</span> <span class="PreProc">ai</span><span class="PreProc">!</span>                      <span class="Comment">&quot; 设置自动缩进</span>
+<span class="Statement">set</span> <span class="PreProc">smartindent</span>              <span class="Comment">&quot; 智能自动缩进</span>
+<span class="Statement">set</span> <span class="PreProc">relativenumber</span>           <span class="Comment">&quot; 开启相对行号</span>
+<span class="Statement">set</span> <span class="PreProc">nu</span><span class="PreProc">!</span>                      <span class="Comment">&quot; 显示行号</span>
+<span class="Statement">set</span> <span class="PreProc">mouse</span>=a                  <span class="Comment">&quot; 启用鼠标</span>
+<span class="Statement">set</span> <span class="PreProc">ruler</span>                    <span class="Comment">&quot; 右下角显示光标位置的状态行</span>
+<span class="Statement">set</span> <span class="PreProc">incsearch</span>                <span class="Comment">&quot; 开启实时搜索功能</span>
+<span class="Statement">set</span> <span class="PreProc">hlsearch</span>                 <span class="Comment">&quot; 开启高亮显示结果</span>
+<span class="Statement">set</span> <span class="PreProc">nowrapscan</span>               <span class="Comment">&quot; 搜索到文件两端时不重新搜索</span>
+<span class="Statement">set</span> <span class="PreProc">nocompatible</span>             <span class="Comment">&quot; 关闭兼容模式</span>
+<span class="Statement">set</span> <span class="PreProc">hidden</span>                   <span class="Comment">&quot; 允许在有未保存的修改时切换缓冲区</span>
+<span class="Statement">set</span> <span class="PreProc">autochdir</span>                <span class="Comment">&quot; 设定文件浏览器目录为当前目录</span>
+<span class="Statement">set</span> <span class="PreProc">foldmethod</span>=syntax        <span class="Comment">&quot; 选择代码折叠类型</span>
+<span class="Statement">set</span> <span class="PreProc">foldlevel</span>=100            <span class="Comment">&quot; 禁止自动折叠</span>
+<span class="Statement">set</span> <span class="PreProc">laststatus</span>=2             <span class="Comment">&quot; 开启状态栏信息</span>
+<span class="Statement">set</span> <span class="PreProc">cmdheight</span>=2              <span class="Comment">&quot; 命令行的高度，默认为1，这里设为2</span>
+<span class="Statement">set</span> <span class="PreProc">writebackup</span>              <span class="Comment">&quot; 设置无备份文件</span>
+<span class="Statement">set</span> <span class="PreProc">autoread</span>                 <span class="Comment">&quot; 当文件在外部被修改时自动更新该文件</span>
+<span class="Statement">set</span> <span class="PreProc">nobackup</span>
+<span class="Statement">set</span> <span class="PreProc">list</span>                     <span class="Comment">&quot; 显示特殊字符，其中Tab使用高亮竖线代替，尾部空白使用高亮点号代替</span>
+<span class="Statement">set</span> <span class="PreProc">listchars</span>=tab<span class="Statement">:</span>\|\ ,trail<span class="Statement">:</span>.
+<span class="Statement">set</span> <span class="PreProc">expandtab</span>                <span class="Comment">&quot; 将Tab自动转化成空格 [需要输入真正的Tab键时，使用 Ctrl+V + Tab]</span>
+<span class="Comment">&quot;set showmatch               &quot; 显示括号配对情况</span>
+<span class="Comment">&quot;set nowrap                  &quot; 设置不自动换行</span>
+
+<span class="Statement">syntax</span> <span class="Type">enable</span>                <span class="Comment">&quot; 打开语法高亮</span>
+<span class="Statement">syntax</span> <span class="Type">on</span>                    <span class="Comment">&quot; 开启文件类型侦测</span>
+<span class="Statement">filetype</span> <span class="Type">indent</span> <span class="Type">on</span>           <span class="Comment">&quot; 针对不同的文件类型采用不同的缩进格式</span>
+<span class="Statement">filetype</span> <span class="Type">plugin</span> <span class="Type">on</span>           <span class="Comment">&quot; 针对不同的文件类型加载对应的插件</span>
+<span class="Statement">filetype</span> <span class="Type">plugin</span> <span class="Type">indent</span> <span class="Type">on</span>    <span class="Comment">&quot; 启用自动补全</span>
+
+
+<span class="Comment">&quot; 设置文件编码和文件格式</span>
+<span class="Statement">set</span> <span class="PreProc">fenc</span>=utf-8
+<span class="Statement">set</span> <span class="PreProc">encoding</span>=utf-8
+<span class="Statement">set</span> <span class="PreProc">fileencodings</span>=utf-8<span class="Statement">,</span>gbk<span class="Statement">,</span>cp936<span class="Statement">,</span>latin-1
+<span class="Statement">set</span> <span class="PreProc">fileformat</span>=unix
+<span class="Statement">set</span> <span class="PreProc">fileformats</span>=unix<span class="Statement">,</span>dos<span class="Statement">,</span>mac
+<span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+    <span class="Statement">source</span> <span class="PreProc">$VIMRUNTIME</span>/delmenu<span class="Operator">.</span><span class="Statement">vim</span>
+    <span class="Statement">source</span> <span class="PreProc">$VIMRUNTIME</span>/<span class="Statement">menu</span><span class="PreProc">.vim</span>
+    <span class="Statement">language</span> <span class="Statement">messages</span> <span class="Statement">z</span>h_CN<span class="Operator">.</span>utf<span class="Operator">-</span><span class="Number">8</span>
+<span class="Statement">endif</span>
+
+
+<span class="Comment">&quot; 使用GUI界面时的设置</span>
+<span class="Statement">if</span> <span class="Identifier">g:isGUI</span>
+<span class="Comment">    &quot; 启动时自动最大化窗口</span>
+    <span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+        <span class="Statement">au</span> <span class="Type">GUIEnter</span> * <span class="Statement">simalt</span> ~<span class="Statement">x</span>
+    <span class="Statement">endif</span>
+<span class="Comment">    &quot;winpos 20 20            &quot; 指定窗口出现的位置，坐标原点在屏幕左上角</span>
+<span class="Comment">    &quot;set lines=20 columns=90 &quot; 指定窗口大小，lines为高度，columns为宽度</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>+=c        <span class="Comment">&quot; 使用字符提示框</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>-=m        <span class="Comment">&quot; 隐藏菜单栏</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>-=T        <span class="Comment">&quot; 隐藏工具栏</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>-=L        <span class="Comment">&quot; 隐藏左侧滚动条</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>-=r        <span class="Comment">&quot; 隐藏右侧滚动条</span>
+    <span class="Statement">set</span> <span class="PreProc">guioptions</span>-=b        <span class="Comment">&quot; 隐藏底部滚动条</span>
+<span class="Comment">    &quot;set showtabline=0       &quot; 隐藏Tab栏</span>
+    <span class="Statement">set</span> <span class="PreProc">cursorline</span>           <span class="Comment">&quot; 突出显示当前行</span>
+<span class="Statement">endif</span>
+
+
+<span class="Comment">&quot; ======= 引号 &amp;&amp; 括号自动匹配 ======= &quot;</span>
+
+:<span class="Statement">inoremap</span> ( ()<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+:<span class="Statement">inoremap</span> ) <span class="Delimiter">&lt;</span><span class="Special">c-r</span><span class="Delimiter">&gt;</span>=ClosePair(')')<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+:<span class="Statement">inoremap</span> { {}<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+:<span class="Statement">inoremap</span> } <span class="Delimiter">&lt;</span><span class="Special">c-r</span><span class="Delimiter">&gt;</span>=ClosePair('}')<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+:<span class="Statement">inoremap</span> [ []<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+:<span class="Statement">inoremap</span> ] <span class="Delimiter">&lt;</span><span class="Special">c-r</span><span class="Delimiter">&gt;</span>=ClosePair(']')<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+:<span class="Statement">inoremap</span> &quot; &quot;&quot;<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+:<span class="Statement">inoremap</span> ' ''<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+:<span class="Statement">inoremap</span> ` ``<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>i
+
+<span class="Statement">function</span> ClosePair<span class="Delimiter">(</span>char<span class="Delimiter">)</span>
+    <span class="Statement">if</span> <span class="Function">getline</span><span class="Delimiter">(</span><span class="String">'.'</span><span class="Delimiter">)</span>[<span class="Function">col</span><span class="Delimiter">(</span><span class="String">'.'</span><span class="Delimiter">)</span> <span class="Operator">-</span> <span class="Number">1</span>] <span class="Operator">==</span> <span class="Identifier">a:char</span>
+        <span class="Statement">return</span> <span class="String">&quot;\&lt;Right&gt;&quot;</span>
+    <span class="Statement">else</span>
+        <span class="Statement">return</span> <span class="Identifier">a:char</span>
+    <span class="Statement">endif</span>
+<span class="Statement">endf</span>
+
+
+<span class="Comment">&quot; 加载pathogen插件管理器</span>
+<span class="Statement">execute</span> <span class="Identifier">pathogen#infect</span><span class="Delimiter">()</span>
+
+
+<span class="Comment">&quot; MiniBufExplorer     多文件切换，也可使用鼠标双击相应文件名进行切换</span>
+<span class="Statement">let</span> <span class="Identifier">g:miniBufExplMapWindowNavVim</span>    <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">let</span> <span class="Identifier">g:miniBufExplMapWindowNavArrows</span> <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">let</span> <span class="Identifier">g:miniBufExplMapCTabSwitchBufs</span>  <span class="Operator">=</span> <span class="Number">1</span>
+<span class="Statement">let</span> <span class="Identifier">g:miniBufExplModSelTarget</span>       <span class="Operator">=</span> <span class="Number">1</span>
+
+<span class="Comment">&quot; :Tlist              调用TagList</span>
+<span class="Statement">let</span> <span class="Identifier">Tlist_Show_One_File</span>        <span class="Operator">=</span> <span class="Number">1</span>             <span class="Comment">&quot; 只显示当前文件的tags</span>
+<span class="Statement">let</span> <span class="Identifier">Tlist_Exit_OnlyWindow</span>      <span class="Operator">=</span> <span class="Number">1</span>             <span class="Comment">&quot; 如果Taglist窗口是最后一个窗口则退出Vim</span>
+<span class="Statement">let</span> <span class="Identifier">Tlist_Use_Right_Window</span>     <span class="Operator">=</span> <span class="Number">1</span>             <span class="Comment">&quot; 在右侧窗口中显示</span>
+<span class="Statement">let</span> <span class="Identifier">Tlist_File_Fold_Auto_Close</span> <span class="Operator">=</span> <span class="Number">1</span>             <span class="Comment">&quot; 自动折叠</span>
+
+<span class="Comment">&quot; :LoadTemplate       根据文件后缀自动加载模板</span>
+<span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+    <span class="Statement">let</span> <span class="Identifier">g:template_path</span> <span class="Operator">=</span> <span class="PreProc">$VIM</span><span class="Operator">.</span><span class="String">'/vimfiles/template/'</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">g:template_path</span> <span class="Operator">=</span> <span class="String">'~/.vim/template/'</span>
+<span class="Statement">endif</span>
+
+<span class="Comment">&quot; snipMate            Tab智能补全</span>
+<span class="Statement">let</span> <span class="Identifier">g:snips_author</span> <span class="Operator">=</span> <span class="String">'Ruchee'</span>
+<span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+    <span class="Statement">let</span> <span class="Identifier">g:snippets_dir</span> <span class="Operator">=</span> <span class="PreProc">$VIM</span><span class="Operator">.</span><span class="String">'/snippets/'</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">g:snippets_dir</span> <span class="Operator">=</span> <span class="String">'~/.vim/snippets/'</span>
+<span class="Statement">endif</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span>                         <span class="Operator">=</span> <span class="Delimiter">{}</span>
+<span class="Comment">&quot; 设置补全项之间的继承关系，比如 PHP补全继承HTML的补全</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases           <span class="Operator">=</span> <span class="Delimiter">{}</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'c'</span>]      <span class="Operator">=</span> <span class="String">'cpp,gtk'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'php'</span>]    <span class="Operator">=</span> <span class="String">'php,html,codeigniter'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'smarty'</span>] <span class="Operator">=</span> <span class="String">'smarty,html'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'blade'</span>]  <span class="Operator">=</span> <span class="String">'blade,html'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'twig'</span>]   <span class="Operator">=</span> <span class="String">'twig,html'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'eruby'</span>]  <span class="Operator">=</span> <span class="String">'eruby,html'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'xhtml'</span>]  <span class="Operator">=</span> <span class="String">'html'</span>
+<span class="Statement">let</span> <span class="Identifier">g:snipMate</span><span class="Operator">.</span>scope_aliases[<span class="String">'html'</span>]   <span class="Operator">=</span> <span class="String">'html,angular'</span>
+
+
+<span class="Comment">&quot; NERD_commenter      注释处理插件</span>
+<span class="Statement">let</span> <span class="Identifier">NERDSpaceDelims</span> <span class="Operator">=</span> <span class="Number">1</span>                        <span class="Comment">&quot; 自动添加前置空格</span>
+
+<span class="Comment">&quot; AuthorInfoDetect    自动添加作者、时间等信息，本质是NERD_commenter &amp;&amp; authorinfo的结合</span>
+<span class="Statement">let</span> <span class="Identifier">g:vimrc_author</span>   <span class="Operator">=</span> <span class="String">'Ruchee'</span>                <span class="Comment">&quot; 昵称</span>
+<span class="Statement">let</span> <span class="Identifier">g:vimrc_email</span>    <span class="Operator">=</span> <span class="String">'my@ruchee.com'</span>         <span class="Comment">&quot; 邮箱</span>
+<span class="Statement">let</span> <span class="Identifier">g:vimrc_homepage</span> <span class="Operator">=</span> <span class="String">'<a href="http://www.ruchee.com">http://www.ruchee.com</a>'</span> <span class="Comment">&quot; 个人主页</span>
+
+<span class="Comment">&quot; Indent_guides       显示对齐线</span>
+<span class="Statement">let</span> <span class="Identifier">g:indent_guides_enable_on_vim_startup</span> <span class="Operator">=</span> <span class="Number">0</span>  <span class="Comment">&quot; 默认关闭</span>
+<span class="Statement">let</span> <span class="Identifier">g:indent_guides_guide_size</span>            <span class="Operator">=</span> <span class="Number">1</span>  <span class="Comment">&quot; 指定对齐线的尺寸</span>
+
+<span class="Comment">&quot; AirLine             彩色状态栏</span>
+<span class="Statement">let</span> <span class="Identifier">g:airline_theme</span> <span class="Operator">=</span> <span class="String">'badwolf'</span>                <span class="Comment">&quot; 设置主题</span>
+
+<span class="Comment">&quot; Syntastic           语法检查</span>
+<span class="Statement">let</span> <span class="Identifier">g:syntastic_check_on_open</span> <span class="Operator">=</span> <span class="Number">1</span>              <span class="Comment">&quot; 默认开启</span>
+<span class="Statement">let</span> <span class="Identifier">g:syntastic_mode_map</span>      <span class="Operator">=</span> <span class="Delimiter">{</span><span class="String">'mode'</span>: <span class="String">'active'</span>,
+<span class="Special">            \</span><span class="String">'active_filetypes'</span>:  [],
+<span class="Special">            \</span><span class="String">'passive_filetypes'</span>: [<span class="String">'html'</span>, <span class="String">'css'</span>, <span class="String">'xhtml'</span>, <span class="String">'eruby'</span>]
+<span class="Special">            \</span><span class="Delimiter">}</span>                                 <span class="Comment">&quot; 指定不需要检查的语言 [主要是因为开启这些语言的语法检查会导致打开文件的速度奇慢]</span>
+
+
+<span class="Comment">&quot; ======= 自定义快捷键 ======= &quot;</span>
+
+<span class="Comment">&quot; Ctrl + H            光标移当前行行首</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">c-h</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>I
+
+<span class="Comment">&quot; Ctrl + J            光标移下一行行首</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">c-j</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;&lt;</span><span class="Special">Down</span><span class="Delimiter">&gt;</span>I
+
+<span class="Comment">&quot; Ctrl + K            光标移上一行行尾</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">c-k</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;&lt;</span><span class="Special">Up</span><span class="Delimiter">&gt;</span>A
+
+<span class="Comment">&quot; Ctrl + L            光标移当前行行尾</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">c-l</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>A
+
+<span class="Comment">&quot; Alt  + H            光标左移一格</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">m-h</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">Left</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; Alt  + J            光标下移一格</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">m-j</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">Down</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; Alt  + K            光标上移一格</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">m-k</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">Up</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; Alt  + L            光标右移一格</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">m-l</span><span class="Delimiter">&gt;</span> <span class="Delimiter">&lt;</span><span class="Special">Right</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \c                  复制至公共剪贴板</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>c &quot;+y
+
+<span class="Comment">&quot; \a                  复制所有至公共剪贴板</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>a <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>ggVG&quot;+y<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \v                  从公共剪贴板粘贴</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>v <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>&quot;+p
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>v &quot;+p
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>v &quot;+p
+
+<span class="Comment">&quot; \bb                 按=号对齐代码 [Tabular插件]</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>bb :Tab /=<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \bn                 自定义对齐    [Tabular插件]</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>bn :Tab /
+
+<span class="Comment">&quot; \nt                 打开NERDTree窗口，在左侧栏显示</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>nt :NERDTree<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \tl                 打开Taglist/TxtBrowser窗口，在右侧栏显示</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>tl :Tlist<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">c-l</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \ff                 打开文件搜索窗口，在状态栏显示 [ctrlp.vim插件]</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>ff :CtrlP<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \16                 十六进制格式查看</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>16 <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:%!xxd<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \r16                返回普通格式</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>r16 <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:%!xxd -r<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \rb                 一键去除所有尾部空白</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rb <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:let _s=@/<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:%s/\s\+$//e<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:let @/=_s<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:nohl<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rb <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:let _s=@/<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:%s/\s\+$//e<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:let @/=_s<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:nohl<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rb <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:let _s=@/<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:%s/\s\+$//e<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:let @/=_s<span class="Delimiter">&lt;</span><span class="Special">Bar</span><span class="Delimiter">&gt;</span>:nohl<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \rt                 一键替换全部Tab为空格</span>
+<span class="Statement">func</span>! RemoveTabs<span class="Delimiter">()</span>
+    <span class="Statement">if</span> &amp;shiftwidth <span class="Operator">==</span> <span class="Number">2</span>
+        <span class="Statement">exec</span> <span class="String">&quot;%s/   /  /g&quot;</span>
+    <span class="Statement">elseif</span> &amp;shiftwidth <span class="Operator">==</span> <span class="Number">4</span>
+        <span class="Statement">exec</span> <span class="String">&quot;%s/   /    /g&quot;</span>
+    <span class="Statement">elseif</span> &amp;shiftwidth <span class="Operator">==</span> <span class="Number">6</span>
+        <span class="Statement">exec</span> <span class="String">&quot;%s/   /      /g&quot;</span>
+    <span class="Statement">elseif</span> &amp;shiftwidth <span class="Operator">==</span> <span class="Number">8</span>
+        <span class="Statement">exec</span> <span class="String">&quot;%s/   /        /g&quot;</span>
+    <span class="Statement">else</span>
+        <span class="Statement">exec</span> <span class="String">&quot;%s/   / /g&quot;</span>
+    <span class="Statement">end</span>
+<span class="Statement">endfunc</span>
+
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rt <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:call RemoveTabs()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rt :call RemoveTabs()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>rt <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:call RemoveTabs()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \th                 一键生成与当前编辑文件同名的HTML文件 [不输出行号]</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>th <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:set nonumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set norelativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:TOhtml<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:w %:r.html<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:q<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set number<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set relativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>th <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:set nonumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set norelativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:TOhtml<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:w %:r.html<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:q<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set number<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set relativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>th <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:set nonumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set norelativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:TOhtml<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:w %:r.html<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:q<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set number<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>:set relativenumber<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+
+<span class="Comment">&quot; \wa                 一键打开Vimwiki首页并编译所有源文件</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>wa <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>\ww<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:VimwikiAll2HTML<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>wa <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>\ww<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:VimwikiAll2HTML<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>wa <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>\ww<span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:VimwikiAll2HTML<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+
+<span class="Comment">&quot; \ev                 编辑当前所使用的Vim配置文件</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>ev <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:e $MYVIMRC<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+
+<span class="Comment">&quot; ======= 编译 &amp;&amp; 运行 &amp;&amp; 模板 ======= &quot;</span>
+
+<span class="Comment">&quot; 编译并运行</span>
+<span class="Statement">func</span>! Compile_Run_Code<span class="Delimiter">()</span>
+    <span class="Statement">exec</span> <span class="String">&quot;w&quot;</span>
+    <span class="Statement">if</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;c&quot;</span>
+        <span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!gcc -Wall -std=c11 -o %:r %:t &amp;&amp; %:r.exe&quot;</span>
+        <span class="Statement">else</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!gcc -Wall -std=c11 -o %:r %:t &amp;&amp; ./%:r&quot;</span>
+        <span class="Statement">endif</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;cpp&quot;</span>
+        <span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!g++ -Wall -std=c++11 -o %:r %:t &amp;&amp; %:r.exe&quot;</span>
+        <span class="Statement">else</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!g++ -Wall -std=c++11 -o %:r %:t &amp;&amp; ./%:r&quot;</span>
+        <span class="Statement">endif</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;lua&quot;</span>
+        <span class="Statement">exec</span> <span class="String">&quot;!lua %:t&quot;</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;php&quot;</span>
+        <span class="Statement">exec</span> <span class="String">&quot;!php %:t&quot;</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;ruby&quot;</span>
+        <span class="Statement">exec</span> <span class="String">&quot;!ruby %:t&quot;</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;sh&quot;</span>
+        <span class="Statement">exec</span> <span class="String">&quot;!bash %:t&quot;</span>
+    <span class="Statement">elseif</span> &amp;<span class="Statement">filetype</span> <span class="Operator">==</span> <span class="String">&quot;make&quot;</span>
+        <span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!make &amp;&amp; app.exe&quot;</span>
+        <span class="Statement">else</span>
+            <span class="Statement">exec</span> <span class="String">&quot;!make &amp;&amp; ./app&quot;</span>
+        <span class="Statement">endif</span>
+    <span class="Statement">endif</span>
+<span class="Statement">endfunc</span>
+
+<span class="Comment">&quot; \R         一键保存、编译、运行</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>R <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:call Compile_Run_Code()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>R :call Compile_Run_Code()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>R <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:call Compile_Run_Code()<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;</span>
+
+<span class="Comment">&quot; \T         一键加载语法模板</span>
+<span class="Statement">imap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>T <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:LoadTemplate<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:AuthorInfoDetect<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>Gi
+<span class="Statement">nmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>T :LoadTemplate<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:AuthorInfoDetect<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>Gi
+<span class="Statement">vmap</span> <span class="Delimiter">&lt;</span><span class="Special">leader</span><span class="Delimiter">&gt;</span>T <span class="Delimiter">&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:LoadTemplate<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>:AuthorInfoDetect<span class="Delimiter">&lt;</span><span class="Special">CR</span><span class="Delimiter">&gt;&lt;</span><span class="Special">ESC</span><span class="Delimiter">&gt;</span>Gi
+
+
+<span class="Comment">&quot; ======= Vimwiki ======= &quot;</span>
+
+<span class="Statement">let</span> <span class="Identifier">g:vimwiki_w32_dir_enc</span>     <span class="Operator">=</span> <span class="String">'utf-8'</span> <span class="Comment">&quot; 设置编码</span>
+<span class="Statement">let</span> <span class="Identifier">g:vimwiki_use_mouse</span>       <span class="Operator">=</span> <span class="Number">1</span>       <span class="Comment">&quot; 使用鼠标映射</span>
+<span class="Statement">let</span> <span class="Identifier">g:vimwiki_valid_html_tags</span> <span class="Operator">=</span> <span class="String">'a,img,b,i,s,u,sub,sup,br,hr,div,del,code,red,center,left,right,h1,h2,h3,h4,h5,h6,pre,script,style'</span>
+<span class="Comment">                                        &quot; 声明可以在wiki里面使用的HTML标签</span>
+<span class="Statement">let</span> <span class="Identifier">blog</span> <span class="Operator">=</span> <span class="Delimiter">{}</span>
+<span class="Statement">if</span> <span class="Identifier">g:isWIN</span>
+    <span class="Statement">if</span> <span class="Identifier">g:atCompany</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path          <span class="Operator">=</span> <span class="String">'D:/Ruchee/Files/mysite/wiki/'</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path_html     <span class="Operator">=</span> <span class="String">'D:/Ruchee/Files/mysite/html/'</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>template_path <span class="Operator">=</span> <span class="String">'D:/Ruchee/Files/mysite/templates/'</span>
+    <span class="Statement">else</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path          <span class="Operator">=</span> <span class="String">'D:/Ruchee/mysite/wiki/'</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path_html     <span class="Operator">=</span> <span class="String">'D:/Ruchee/mysite/html/'</span>
+        <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>template_path <span class="Operator">=</span> <span class="String">'D:/Ruchee/mysite/templates/'</span>
+    <span class="Statement">endif</span>
+<span class="Statement">else</span>
+    <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path          <span class="Operator">=</span> <span class="String">'~/mysite/wiki/'</span>
+    <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>path_html     <span class="Operator">=</span> <span class="String">'~/mysite/html/'</span>
+    <span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>template_path <span class="Operator">=</span> <span class="String">'~/mysite/templates/'</span>
+<span class="Statement">endif</span>
+<span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>template_default  <span class="Operator">=</span> <span class="String">'site'</span>
+<span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>template_ext      <span class="Operator">=</span> <span class="String">'.html'</span>
+<span class="Statement">let</span> <span class="Identifier">blog</span><span class="Operator">.</span>auto_export       <span class="Operator">=</span> <span class="Number">1</span>
+
+<span class="Statement">let</span> <span class="Identifier">g:vimwiki_list</span> <span class="Operator">=</span> [blog]
+</pre>
+
+<script type="text/javascript" src="http://js.tongji.linezing.com/2785323/tongji.js"></script>
+
+</body>
+</html>
+<!-- vim: set foldmethod=manual : -->

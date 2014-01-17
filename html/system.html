@@ -1,0 +1,414 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <!-- SyntaxHighlighter -->
+        <script src="../public/sh/scripts/shCore.js"></script>
+        <script src="../public/sh/scripts/shBrushAll.js"></script>
+        <link type="text/css" rel="stylesheet" href="../public/sh/styles/shCore.css"/>
+        <link type="text/css" rel="stylesheet" href="../public/sh/styles/shThemeMidnight.css"/>
+        <script>
+                SyntaxHighlighter.config.clipboardSwf = '../public/sh/scripts/clipboard.swf';
+                    SyntaxHighlighter.all();
+        </script>
+                <!-- 第一行是引入核心文件 -->
+                <!-- 第二行是引入语法高亮文件（可视需要书写多条，具体可查看 scripts 文件夹下的各个文件） -->
+                <!-- 更多语法高亮请访问 https://github.com/ruchee/backup2/tree/master/scripts 获取 -->
+                <!-- 第三行是引入基本 CSS 文件 -->
+                <!-- 第四行是指定使用的颜色主题（更多主题可查看 styles 文件夹） -->
+                <!--  指代的是 HTML 代码根目录 -->
+        <title>Mdaxue服务器配置</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="Stylesheet" type="text/css" href="../public/css/main.css" />
+        <!-- blog ico -->
+        <link type="image/x-icon" rel="icon" href="../public/images/ruchee.ico" />
+        <link type="image/x-icon" rel="shortcut icon" href="../public/images/ruchee.ico" />
+    </head>
+    <body>
+        <center style="font-family: 'Microsoft Yahei', sans-serif; font-size: 1.80em;
+            font-weight: normal; color: #FF6600">Mdaxue-Wiki</center><br />
+        <center>MdaxueWiki系统</center>
+
+
+        
+<h2 id="toc_0.1">Mdaxue服务器配置</h2>
+<hr />
+<h3 id="toc_0.1.1">Overview(概述)</h3>
+<p>
+支持mdaxue系统的服务目前有3台
+</p>
+
+<table>
+<tr>
+<th>
+WanIp
+</th>
+<th>
+LanIp
+</th>
+<th>
+HostName
+</th>
+<th>
+Disk
+</th>
+<th>
+Cpu
+</th>
+<th>
+Mem
+</th>
+<th>
+Os
+</th>
+</tr>
+<tr>
+<td>
+221.174.24.98
+</td>
+<td>
+192.168.0.13
+</td>
+<td>
+web
+</td>
+<td>
+2T
+</td>
+<td>
+Intel(R) Xeon(R) CPU E5335 @2.00GHz x4
+</td>
+<td>
+20G
+</td>
+<td>
+CentOS6.2
+</td>
+</tr>
+<tr>
+<td>
+221.174.24.101
+</td>
+<td>
+192.168.0.19
+</td>
+<td>
+static
+</td>
+<td>
+20T
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+221.174.24.110
+</td>
+<td>
+192.168.0.21
+</td>
+<td>
+db
+</td>
+<td>
+3T
+</td>
+<td>
+Intel(R) Xeon(R) CPU E5-4620@2.20GHz x32
+</td>
+<td>
+64G
+</td>
+<td>
+CentOS6.3
+</td>
+</tr>
+</table>
+<p>
+我们以后就简称为<code>98</code>、<code>101</code>、<code>110</code>。
+</p>
+<ol>
+<li>
+<code>98</code>服务器我们称之为<code>web服务器</code>，具体架构是:
+
+<ul>
+<li>
+<code>LNTP</code>,Linux+Nginx1.2.6+Tomcat6.0.37+JDK1.6.0_30+PHP5.3.20,编译的这些组件所需的源代码都在<code>/usr/local/src</code>,安装完成后的目录一般是<code>/usr/local</code>下面，比如Nginx，/usr/local/nginx,如果后面不做特殊说明都是安装在这个目录下面.
+
+<li>
+Memcache服务器,启动方式:<code>service memcached start</code> 命令为<code>/usr/local/bin/memcached -d -m 256 -u root -p 11211 -l 192.168.0.13 -c 256 -P /tmp/memcached.pid</code> 意思为以后台运行(-d) 内存大小为256M(-m) root用户启动-u,监听端口为11211 -p，监听ip为单单内网监听192.168.0.13 -l, 最大连接数为256 -c ,进程pid文件存放路径 -P /tmp/memcached.pid.
+
+<li>
+NFS服务器，启动方式为：<code>/etc/rc.local</code>,命令为<code>mount -t nfs 192.168.0.19:/mysql/static /mnt/imgsvr</code>,代表将本服务器/mnt/imgsvr目录挂载到101服务器上的/mysql/static目录下以供101学盘服务器使用.
+
+<li>
+FastDfs服务器,启动方式为:<code>/etc/rc.local</code>,命令为<code>fdfs_trackerd /etc/fdfs/tracker.conf</code>、<code>fdfs_storaged /etc/fdfs/storage.conf</code>,前一个为启动tracker,后一个为启动storage,关于具体的概念可以查考后面FastDfs介绍安装和配置.
+
+<li>
+Gerrit代码审核服务器，启动方式为<code>/etc/rc.local</code>,命令为<code>su cms /home/cms/gerrit/bin/gerrit.sh restart</code>,以cms用户启动gerrit服务.
+
+<li>
+Nginx服务器，启动方式为：<code>service nginx start</code>,Nginx编译后安装在<code>/usr/local/nginx</code>,日志目录为<code>logs</code>,配置文件都放在<code>conf</code>,虚拟主机配置在<code>conf/vhost</code>,添加虚拟主机的脚本在<code>/home/vhost.sh</code>,当然也可以直接Copy现有的虚拟主机，然后在此基础上修改，推荐这样做。如果要使用脚本，请注意第二个选择的时候选No，不要开启Ftp功能。<code>/home/cut-nginx-log.sh</code>为nginx日志每天定时切割脚本，这个放在root用户的计划任务里面，用crontab -u root -e 即可查看和修改。具体的配置说明请查考Nginx安装与配置.
+
+<li>
+Tomcat服务器，启动方式为手动启动，<code>这里由斌斌完善</code>.
+
+<li>
+JDK安装在<code>/usr/local/jdk1.6.0_30</code>,自动启动.
+
+<li>
+PHP安装在<code>/usr/local/php5</code>,主要安装的扩展有<code>fastdfs_client.so</code>、<code>beast.so</code>、<code>runkit.so</code>、<code>swoole.so</code>、<code>redis.so</code>、<code>memcache.so</code>,其中beast是一个加密扩展，runkit是热部署模块，swoole是swoole服务模块，其它的都应该很熟悉，这几个具体的功能在查看相关安装文档。
+
+<li>
+Swoole服务，该服务是一个php写的server，具体介绍可以百度一下，该项目是github的一个开源项目，地址为<code>https://github.com/matyhtf/swoole</code>,该服务在其实是一个项目，用来后期支持Mdaxue系统的Webservice而启用的，方便后期跨语言跨服务器跨平台等问题的处理。前期只是用来处理获取公共导航中的学校这个问题，后期这个问题会用lua来处理，swoole项目也会改进然后重新发布，具体的请看相关项目。概述这里，只介绍有这一个服务，并且必须启动否则Mdaxue系统会跑不起来，后期lua上线后可以废弃掉。启动方式为: <code>cd /data/wwwroot/public.mdaxue.com/server/examples</code>、<code>php webserver.php</code>即可.监听端口为8888.
+
+<li>
+因为是web服务器,防火墙只开启80端口，其它端口都只供内网访问，所有项目都放在/data/wwwroot下面,对应的域名文件夹，即为相关web服务器路径.部署项目直接进入文件夹,git pull(只使用于php)，Java项目请参考Tomcat介绍.
+
+</ul>
+<li>
+101服务器我们称之为<code>学盘服务器</code>,具体架构是:<code>陈文辉完善</code>
+
+<li>
+110服务器我们称之为<code>数据库服务器</code>,具体架构为:
+
+<ul>
+<li>
+主要安装的是Mysql服务器,启动方式为<code>service mysqld start</code>,安装路径<code>/usr/local/mysql</code>,监听端口:内网监听，Mysql数据库data目录：<code>/data/mysql</code>,每日增量备份脚本<code>/root/mysql_daily_backup.sh</code>,每月全量备份脚本<code>/root/mysql_full_backup.sh</code>,具体启动方式在root的计划任务中可以看到.
+
+<li>
+Redis服务器，启动方式为<code>service redis start</code>,命令为<code>/usr/local/bin/redis-server /etc/redis.conf</code>,代表着Redis服务器的配置文件在<code>/etc/redis.conf</code>.内网监听.
+
+<li>
+Memcache服务器,启动方式为<code>service memcached start</code>,命令为<code>/usr/local/bin/memcached -d -m 1024 -u root -p 11211 -l 192.168.0.21 -c 256 -P /tmp/memcached.pid</code>,具体意思可参考98服务器，这里不同的是开启了1个G的内存，以适应Java需要.
+
+<li>
+没有对外网开通任何端口，上述所有服务都以内网为监听，所以不存在被入侵的可能性，如果被入侵要考虑内网被信任的机器.
+
+</ul>
+</ol>
+<hr />
+<h3 id="toc_0.1.2">约定</h3>
+<pre>
+    注意:这里为所有安装过程中的约定。是在下面公共篇中生产服务器在安装过程当中必须遵循的，是系统
+    维护人员必须最先阅读的，否则下面各个服务组件的安装都有可能失败。
+</pre>
+<ol>
+<li>
+首次安装，即CentOS为初始化安装，必须执行以下命令:
+<pre class="brush: bash">
+              echo -e "# Firewall configuration written by system-config-firewall\n# Manual customization of this file is not recommended.\n*filter\n:INPUT ACCEPT [0:0]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [0:0]\n-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT\n-A INPUT -p icmp -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT\n-A INPUT -m state --state NEW -m tcp -p tcp --dport 21 -j ACCEPT\n-A INPUT -m state --state NEW -m tcp -p tcp --dport 10045:10090 -j ACCEPT\n-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT\n-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT\n-A INPUT -j REJECT --reject-with icmp-host-prohibited\n-A FORWARD -j REJECT --reject-with icmp-host-prohibited\nCOMMIT" &gt; /etc/sysconfig/iptables
+              service iptables restart
+              echo -e "#SELINUX=enforcing\n#SELINUXTYPE=targeted\nSELINUX=disabled\nSETLOCALDEFS=0" &gt; /etc/selinux/config
+              yum install -y make apr* autoconf automake curl-devel gcc gcc-c++ gtk+-devel zlib-devel openssl openssl-devel pcre-devel gd gettext gettext-devel kernel keyutils patch perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-li bs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel libXpm* freetype freetype-devel freetype* fontconfig fontconfig-devel libjpeg* libpng* php-common php-gd ncurses* libtool* libxml2 libxml2-devel patch policycoreutils bison gd-devel git
+</pre>
+            页面上的<code>&amp;gt;</code>代表<code>&gt;</code>符号,以上操作分别是初始化防火墙，开启22，21，80，3306这几个端口，后期可以调整，然后启动
+            防火墙，关闭SELINUX，最后是yum 安装许多其它软件都必须安装的组件。
+
+<li>
+在以后的安装过程中，都不会说明软件包从哪里来的，即不会有<code>wget -c http://nginx.org/download/nginx-1.2.9.tar.gz</code>这样的语句，除非特别说明或者特殊情况，所有的软件包都应该下载到<code>/usr/local/src</code>中
+    可以有同一个软件的不同版本。而且所有软件版本包也都必须上传到<code>http://qun.yunpan.360.cn/10054480</code>
+    这个共享群的<code>Packages</code>文件夹里面,邀请码为3468。约定就是软件源码包都放在<code>/usr/local/src</code>,安装一般都通过<code>--prefix=/usr/local</code>
+    安装到<code>/usr/local</code>。安装过程中没有说明的配置文件都放在该共享中的<code>Packages/etc</code>
+
+</ol>
+<hr />
+<h3 id="toc_0.1.3">公共篇(CentOS)</h3>
+<p>
+这里的内容我们定义为所有在生产服务器或者内网测试服务器，操作系统以CentOS平台的公共内容。如Nginx即代表，在CentOS平台上面Nginx的安装和配置以及配置的详细介绍等.也即是，凡是以CentOS为平台的服务器，即可适用下面的文章.
+</p>
+<pre>
+    注意:这里虽说是所有CentOS平台的内容都可以放在这里，但是这里主要还是放和生产服务器有关的内容，在生产服务器上面不存在的组件不要放在这里，可以放到个别篇中的CentOS中.
+</pre>
+<hr />
+<ol>
+<li>
+<a href="system/server/nginx.html">Nginx1.2.6的配置与安装</a>
+
+<li>
+<a href="system/server/mysql.html">Mysql5.5.28的配置与安装</a>
+
+<li>
+<a href="system/server/php.html">php5.3.27的配置与安装</a>
+
+<li>
+<a href="system/server/jdk.html">Jdk1.6.0_37的配置与安装</a>
+
+<ul>
+<li>
+斌斌完善
+
+</ul>
+<li>
+<a href="system/server/tomcat.html">Tomcat6.0_37的配置与安装</a>
+
+<ul>
+<li>
+斌斌完善
+
+</ul>
+<li>
+<a href="system/server/memcached.html">Memcached1.4.15的配置与安装</a>
+
+<li>
+<a href="system/server/redis.html">Redis2.6.13的配置与安装</a>
+
+<li>
+<a href="system/server/fastdfs.html">FastDfs4.0.6的配置与安装</a>
+
+<li>
+<a href="system/server/nfs.html">NFS的配置与安装</a>
+
+<ul>
+<li>
+斌斌完善
+
+</ul>
+<li>
+<a href="system/server/git.html">Git的安装与使用</a>
+
+<ul>
+<li>
+斌斌完善
+
+</ul>
+<li>
+<a href="system/server/gerrit.html">Gerrit2.5.6的配置与安装</a>
+
+<li>
+  - 斌斌完善
+
+<li>
+<a href="system/server/swoole.html">Swoole1.6.1的配置与安装</a>
+
+<li>
+<a href="system/server/pan.html">学盘服务器文档预览组件的配置与安装</a>
+
+<ul>
+<li>
+文辉完善
+
+</ul>
+<li>
+<a href="system/server/iptables.html">Iptables的配置与安装</a>
+<pre>
+    如果这里有遗漏的、或者后期添加更新改进的、不论什么情况，只有是生产上面提供服务的，在这里都必须添加进来.
+    最终要保证的是只要按照这里面所有的内容操作，Mdaxue线上的所有功能和服务都能正常的运行.
+</pre>
+
+</ol>
+<hr />
+<h3 id="toc_0.1.4">个别篇</h3>
+<p>
+这里的内容我们定义为所有不在公共篇里面，但又为Mdaxue系统所需要知道的内容，分别主要以两个平台区分。如，我们个人本地bind配置，那就肯定属于这里，并且是Ubuntu平台下.又如phpmyadmin，这个明显属于平台无关性.
+</p>
+<h4 id="toc_0.1.4.1">平台无关性</h4>
+<ol>
+<li>
+<a href="system/private/independence/jdk.html">Jdk的安装与配置</a>
+
+<li>
+<a href="system/private/independence/tomcat.html">Tomcat的安装与配置</a>
+
+<li>
+<a href="system/private/independence/phpmyadmin.html">phpMyadmin的安装与配置</a>
+
+<li>
+<code>Nginx配置文件详解</code>
+
+<ul>
+<li>
+这里可参看<a href="system/server/nginx.html">Nginx1.2.6的配置与安装</a>中的<code>配置详解</code>相关章节
+
+</ul>
+<li>
+<a href="system/private/independence/vimwiki.html">Vimwiki的使用入门</a>
+
+</ol>
+<hr />
+<h4 id="toc_0.1.4.2">CentOS平台</h4>
+<ol>
+<li>
+<a href="system/private/centos/git.html">Git的安装与使用</a>
+
+</ol>
+<hr />
+<h4 id="toc_0.1.4.3">Ubuntu平台</h4>
+<p>
+下面的基本上都可以通过apt-get方式安装，也不需要配置很方便，所以并不是所有的都有详细的文档，而且这也只是个人用的，有需要的可以自行完整或新增。
+</p>
+<ol>
+<li>
+<a href="system/private/ubuntu/bind.html">Bind9的安装与配置</a>
+
+<li>
+<a href="system/private/ubuntu/git.html">Git的安装与使用</a>
+
+<li>
+LAMP的安装与配置
+<pre class="brush :bash">
+        sudo apt-get install lamp #以上命令即可搞定不需任何配置，如果需要编译安装可在该文档中自行添加
+</pre>
+
+<li>
+<a href="system/private/ubuntu/fastdfs.html">FastDfs的安装与配置</a>
+
+<li>
+Nginx的安装与配置
+
+<ul>
+<li>
+该处完全可以参考CentOS平台的编译安装与配置。
+
+<li>
+如果通过apt-get 方式安装只需要去Nginx官网添加源即可。
+
+</ul>
+<li>
+Redis的安装与配置
+<pre class="brush :bash">
+sudo apt-get install redis-server
+</pre>
+
+<li>
+memcahced的安装与配置
+<pre class="brush :bash">
+sudo apt-get install memcached
+</pre>
+
+<li>
+PHP的安装、配置以及扩展的编译安装
+
+<ul>
+<li>
+可以完全参考CentOS平台，因为这个编译和平台没有多大关系，只不过安装之前也是要先解决依赖关系，可以执行
+<pre class="brush :bash">
+            apt-get -y install build-essential autoconf automake libxml2 libxml2-dev libjpeg-dev libpng-dev php5-gd \
+            bzip2 libbz2-dev curl libcurl4-gnutls-dev libfreetype6-dev libcurl3-openssl-dev libxpm-dev libfreetype6-dev \
+            libmcrypt-dev libxslt1-dev 
+</pre>
+
+<li>
+编译安装过程中如果出现什么问题可以讨论或总结写在这里，一般基本上就是找不到相关的库，网上google一下应该就能解决。
+
+<li>
+如果不需要编译安装的话，直接<code>apt-get install lamp</code>的时候就能自动装上。
+
+</ul>
+</ol>
+
+
+
+        <center  style="font-family: 'Microsoft Yahei'; font-size: small; font-weight: normal; color: #009933">
+            Mdaxue&nbsp;&copy;&nbsp;2011-2013&nbsp;www.mdaxue.com<br/>
+            Generated by Vim and Vimwiki
+        </center>
+    </body>
+</html>

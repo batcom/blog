@@ -1,0 +1,85 @@
+<html>
+<head>
+  <title>404</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style type="text/css">
+    html {
+      color: #cad3d6;
+      min-height: 100%;
+      background: -webkit-gradient(linear , 0 100, 0 98%, from(#163346), to(#000309) );
+      background-color: #123;
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      max-width: 1200px;
+      position: relative;
+      margin: 40px auto 15px;
+      font: 100 14px/1.5 "Trebuchet MS", Helvetica, SimSun, sans-serif;
+    }
+
+    h1, h6 {
+      font-family: "Microsoft Yahei", sans-serif;
+      margin: 0;
+      padding: 0.15em 0;
+    }
+
+    h1 {
+      font-size: 1.7em;
+      padding-bottom: 0.1em;
+      color: #f37;
+      margin-bottom: 0.5em;
+      margin-top: 0;
+    }
+
+    h6 {
+      font-size: 1.0em;
+      color: #99CC00;
+    }
+
+    .justcenter {
+      text-align: center;
+    }
+  </style>
+</head>
+
+  <br><br><br><br>
+  <br><br><br><br>
+
+  <h1 id="toc_1" class="justcenter">404 您要找的页面不存在</h1>
+
+  <h6 id="toc_1.0.0.0.0.1" class="justcenter" name="site">www.ruchee.com</h6>
+
+  <script>
+      var url = window.location.href;
+      if (url.match(/^.*[vV]im.*$/)) {
+          var html = "<br/><hr>";
+          html += "<br/><h1 class='justcenter'>浏览Vim配置的朋友请注意！</h1>";
+          html += "<h6 class='justcenter'>本站所有Vim相关的页面已移除，请访问下面的链接浏览我最新的配置：<br/><br/>" +
+              "<a href='https://github.com/ruchee/vim' target='_blank'>https://github.com/ruchee/vim</a><br/><br/>"+
+              "多有不便，还望见谅" +
+              "<br/><br/></h6>";
+          html += "<hr>";
+          document.writeln(html);
+      } else if (url.match(/^.*download.*$/)) {
+          var html = "<br/><hr>";
+          html += "<br/><h1 class='justcenter'>下载文件的朋友请注意！</h1>";
+          html += "<h6 class='justcenter'>实在抱歉，由于下载量太大，区区几个文件竟然将博客流量尽数耗尽<br/><br/>" +
+              "为保证博客的正常访问，我已将整个下载目录全部清除，请通过下面的途径进行下载：<br/><br/>" +
+              "1、Github：<a href='https://github.com/ruchee/backup/tree/master/download' target='_blank'>https://github.com/ruchee/backup/tree/master/download</a><br/><br/>" +
+              "2、Git命令：git clone https://github.com/ruchee/backup.git（下载文件在download目录）<br/><br/>" +
+              "多有不便，还望见谅" +
+              "<br/><br/></h6>";
+          html += "<hr>";
+          document.writeln(html);
+      }
+  </script>
+
+  <br><br><br>
+  <br><br><br>
+
+  <script type="text/javascript" src="http://js.tongji.linezing.com/2785323/tongji.js"></script>
+
+</body>
+</html>

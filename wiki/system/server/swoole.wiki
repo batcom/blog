@@ -1,0 +1,330 @@
+%title Swoole1.6.1的配置与安装
+==Swoole1.6.1的配置与安装==
+===Swoole简介===
+swoole是一款用C编写的为php提供高性能的`socket`、`appserver`等支持的php扩展。因为php对网络、多线程等支持并不好，所以php虽然在web端有很强的优势，但是对于编写网络服务就远不如`Java`、`Nodejs`等。但`swoole`弥补了php这方面的缺点，同时继承了php的简单性，可以让我们用php作为写应用服务器开发了，这原来只能是`C/C++`、`JAVA`等系统级别的语言可以做的事情。
+简单点说就是你现在不只可以用php来写web端程序，还可以用`php+swoole`实现一个`高性能WebServer`如`Nginx`，或者`聊天室服务端`、`消息队列服务器`，`mysql连接池异步查询`等都是可以的。这样的效率是可想而知的。如果还有什么想了解的话，就可以自行google了。
+----
+===Swoole的安装与配置===
+详见[[php|php.5.3.27的安装与配置]]
+----
+===Swoole服务框架===
+swoole实际上是一个扩展，也就是一个.so文件，是基于C实现的。因为作者也精通php所以基于php也写了一个框架：swoole_framework,但是我们这里不去讨论swoole_framework，因为这个框架本生也很大。所以我们在这里说到的`swoole框架`都指的是`C扩展`，即.so文件为我们提供的功能，而不是swoole_framework。为什么呢？因为`swoole_framework`是php写的框架而已，php的框架多的去了，我们需要的是明白`swoole.so`提供的原理，然后结合我们自己的项目，将其整合进去，就像`zphp`框架和其作者一样。我们最重要的就是明白底层原理。这个弄明白了，php我们自己不会写吗？因为这个项目还是比较火的，到写本文的时候作者已经更新了好几个版本，也新增了好一些功能，比如什么定时器啊，为php做`游戏服务器`提供了便利。但我们这里是讲1.6.1这个版本，因为生产上面用的是这个版本，而且我们实际需求也用不了那么多功能。下面介绍Swoole的核心功能和架构。
+----
+===swoole核心功能和原理===
+实际上swoole就是将实现`网络服务的底层`，如`TCP/IP协议`用C实现了，包括网络中需要使用的`网络模型`、`IO事件`等封装了,然后给php提供了几个接口，php使用这几个接口就可以实现网络服务了。所以我们主要来看它所提供的接口。既然是基于网络的就肯定存在`client`、`server`了。所以我们以两方面来介绍接口
+----
+====swoole-client客户端接口====
+swoole的client部分提供了tcp/udp socket的类封装代码，使用时仅需 new swoole_client即可。 swoole的socket client对比PHP提供的stream族函数有哪些好处：
+* stream函数存在超时设置的陷阱和Bug，一旦没处理好会导致Server端长时间阻塞
+* fread有8192长度限制，无法支持UDP的大包
+* swoole_client支持waitall，在知道包长度的情况下可以一次取完，不必循环取。
+* swoole_client支持UDP connect，解决了UDP串包问题
+* swoole_client是纯C的代码，专门处理socket，stream函数非常复杂。swoole_client性能更好
+----
+# `方法列表`:
+    - `swoole_client->__construct`: 函数原型: 
+    {{{class="brush :php"
+    swoole_client->__construct(int $sock_type, int $is_sync = SWOOLE_SOCK_SYNC)
+    }}}
+        * $sock_type表示socket的类型，如TCP/UDP。
+        * $is_sync表示同步还是异步。
+    - `swoole_client->connect`: 函数原型：
+    {{{class="brush :php"
+        bool $swoole_client->connect(string $host, int $port, float $timeout = 0.1, int $flag = 0)
+    }}}  
+        * $host是远程服务器的地址
+        * $port是远程服务器端口
+        * $timeout是网络IO的超时，单位是s，支持浮点数。默认为0.1s，即100ms
+        * $flag参数在UDP类型时表示是否启用udp_connect
+        * $flag=1表示设置为非阻塞socket，connect会立即返回
+    - `swoole_client->send`: 与远程Server建立连接后，可向Server发送数据。函数原型：
+    {{{class="brush :php"
+    int $swoole_client->send(string $data);
+    }}}
+        * 成功发送返回的已发数据长度
+        * 参数为字符串，支持二进制数据。
+        * 失败返回false，并设置$swoole_client->errCode
+    - `swoole_client->recv`: recv方法用于从服务器端接收数据。接受2个参数。函数原型为：
+    {{{class="brush :php"
+    string $swoole_client->recv(int $size = 65535, bool $waitall = 0);
+    }}}
+        * $size：接收数据的最大长度
+        * $waitall: 是否等待所有数据到达后返回
+        * 如果设定了waitall就必须设定准确的size，否则会一直等待，直到接收的数据长度达到size
+        * 如果设置了错误的$size，会导致recv超时，返回 false
+        * 调用成功返回结果字符串，失败返回 false，并设置$swoole_client->errCode属性
+# `属性列表`:
+    - `swoole_client->errCode`: 类型为int型。当connect/send/recv/close失败时，会自动设置$swoole_client->errCode的值。errCode的值等于Linux errno.
+----
+我们这里详细介绍了`swoole组件`的提供给php的客户端接口极其说明，所以我们要做的就是对这几个接口进行实现，在生产上实现的是`MdaxueClient.class.php`这个文件,我们来看一下，它是怎么封装的。
+{{{class="brush :php"
+<?php
+class Mdaxue_Client{
+
+ 	protected $post='POST /hello/index HTTP/1.1
+Host: 127.0.0.1:8888
+Accept: */*
+Content-Length: 35
+FlagServer: Mdaxue
+Content-Type: application/x-www-form-urlencoded
+Cookie: 
+
+';
+ 
+ 	protected $get='GET /hello/index HTTP/1.1
+Host: 127.0.0.1:8888
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3
+FlagServer: Mdaxue
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Cookie: 
+
+';
+ 	public $client;
+ 	
+ 	public function __construct(){
+ 		$this->client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_SYNC); //同步阻塞
+ 		$config = C('MDAXUE_SERVER');
+ 		$ret = $this->client->connect($config['host'],$config['port'],$config['timeout'],$config['async']);
+ 		if(!$ret)
+ 		{
+ 			die("Connect Server fail.errCode=".$client->errCode);
+ 		}
+ 	}
+ 	public function send($data,$method='post'){
+ 		if(is_array($data)){
+		 			$send = http_build_query($data['data']);
+		 	$cookie = '';
+		 	if(!empty($_COOKIE)){
+			 	foreach ($_COOKIE as $key => $cv){
+			 		$cookie.=$key.'='.$cv.';';
+			 	}
+			 	$cookie = substr($cookie, 0,strlen($cookie)-1);//拼接cookie,让服务器共享
+		 	}
+	 		if($method=='post'){
+	 			$this->post = str_replace('Content-Length: 35', 'Content-Length: '.strlen($send), $this->post);
+	 			$this->post = str_replace('POST /hello/index', "POST /{$data['c']}/{$data['a']}", $this->post);
+	 			$this->post = str_replace('Cookie: ', 'Cookie: '.$cookie, $this->post);
+	 			$this->client->send($this->post.$send);
+	 		}else {
+	 			$this->get = str_replace('GET /hello/index', "GET /{$data['c']}/{$data['a']}", $this->get);
+	 			$this->get = str_replace('Cookie: ', 'Cookie: '.$cookie, $this->get);
+	 			$this->client->send($this->get.$send);
+	 		}
+ 		}else {
+ 			die('发送的数据错误！');
+ 		}
+ 	}
+ 	
+ 	public function recv(){
+ 		return $this->client->recv();
+ 	}
+ 	
+	
+}
+?>
+}}}
+这里我们明显看到该类封装了我们上面提到的4个接口`__construct`、`_connect` `send` `recv`这四个方法，所以客户端使用的时候直接`include`该类，然后向服务端请求数据，这里给个实例:
+{{{class="brush :php"
+        Factory::loadBLL("MdaxueClient.class");
+        $client = new Mdaxue_Client();
+        //var_dump($client);
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
+        $client->send(array('c' => 'mdaxue', 'a' => 'getcollegeid',
+        		'data' => array(
+        				'url' => $url,
+        				'clientip'=>uploadBusiness::Instance()->clientIP()
+        		)
+        ), 'post');
+        $college = $client->recv();
+
+}}}
+我们也看到使用很简单，因为和我们相关的逻辑都已经封装好了我们客户端只需要实例化，然后`send+revc`即可完成服务请求。到此客户端我们应该知道如何使用了。服务端我们也会以此方式进行讲解。
+----
+====swoole-server服务端接口====
+我们刚刚讲了，服务端也将以客户端介绍的形式向大家介绍。比如客户端讲怎么`连接`，`发送`，然后是`接收`,那么服务端肯定就是介绍如何处理链接、处理数据、发送应答了，所有的网络服务模型都差不多。我们来看看服务端提供的接口.
+----
+# 方法列表:
+    - `onStart`: Server启动在主进程的主线程回调此函数，函数原型
+        {{{class="brush :php"
+        void onStart(resource $server);
+        }}}
+        在此事件之前Swoole Server已进行了如下操作:
+        * 已创建了manager进程
+        * 已创建了worker子进程
+        * 已监听所有TCP/UDP端口
+        * 已监听了定时器
+    - `onConnect`: 有新的连接进入时，在worker进程中回调。函数原型：
+        {{{class="brush :php"
+        void onConnect(resource $server, int $fd, int $from_id);
+        }}}
+        * $server是swoole的资源对象
+        * $fd是连接的文件描述符，发送数据/关闭连接时需要此参数
+        * $from_id来自那个poll线程
+    - `onRecive`: 接收到数据时回调此函数，发生在worker进程中。函数原型：
+        {{{class="brush :php"
+        void onReceive(resource $server, int $fd, int $from_id, string $data);
+        }}}
+        * swoole只负责底层通信，数据的格式，解包打包，包完整性检测需要放在应用层处理。
+        * onReceive回调函数收到的数据最大为8192，可以修改swoole_config.h中SW_BUFFER_SIZE宏来调整
+        * Swoole支持二进制格式，$data可能是二进制数据
+----
+果然服务端是提供了这些接口给我们使用，然后最后一个向客户端发送数据是swoole通过扩展函数`swoole_server_send`,向客户端发送数据，函数原型：
+{{{class="brush :php"
+bool swoole_server_send(resource $serv, int $fd, string $data, int $from_id = 0);
+}}}
+* $data的长度可以是任意的。扩展函数内会进行切分。如果是UDP协议，会直接在worker进程内发送数据包。
+* 发送成功会返回true，如果连接已被关闭或发送失败会返回false.
+----
+本来有了这几个接口我们可以自己实现我们的Server类，但由于当初初次接触该框架，所以直接用到了上面提到的swoole_framework,生产上面的Swoole服务正是基于这个框架搭建的，但是这并不是最优方案，因为这个框架学习起来也很麻烦，功能太多，正如上面所说我们已经定制了一个适合我们的简单的服务端，但只是还没有部署，所以这里也只会简单的介绍一下该框架在生产上的架构和基本维护。
+====swoole_framework====
+该项目位于`public`项目下面的`server`文件夹内。即`/data/wwwroot/public.mdaxue.com/server`。该文件夹里面有个`examples`文件夹，这里面有个文件`webserver.php`，我们生产上面运行的即是该服务，启动方式概览里有讲:`php webserver.php`,所以我们从该php文件来入手研究。
+{{{class="brush :php"
+<?php
+error_reporting(0);
+/**
+ * 初始化ThinkPHP的类库优先加载哪里都能使用
+ */
+/******************加载ThinkPHP内核模型**********************/
+define('ROOT_PATH', dirname(__FILE__));
+define('THINK_PATH', ROOT_PATH.'/ThinkPHP/');
+require(THINK_PATH . 'common.php');//核心函数库
+require(ROOT_PATH . '/config.php');
+require(THINK_PATH . 'Model.class.php');
+require(THINK_PATH . 'Db.class.php');
+require(THINK_PATH . 'DbMysql.class.php');
+require(THINK_PATH . 'Cache.class.php');
+require(THINK_PATH . 'CacheFile.class.php');
+require(THINK_PATH . 'CacheMemcache.class.php');
+require(THINK_PATH . 'CacheRedis.class.php');
+/*******************分割线**********************************/
+define('DEBUG', 'on');
+//define("WEBPATH", str_replace("\\","/", __DIR__.'/../'));
+define('WEBPATH', '/home/coolnet/projects/public/server');
+// var_dump(WEBPATH);
+require __DIR__ . '/../libs/lib_config.php';
+//require __DIR__'/phar://swoole.phar';
+Swoole\Config::$debug = true;
+$AppSvr = new Swoole\Network\Protocol\AppServer();
+$AppSvr->loadSetting("./swoole.ini"); //加载配置文件
+$AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
+$AppSvr->setLogger(new \Swoole\Log\EchoLog('server.log')); //Logger
+
+Swoole\Error::$echo_html = false;
+$server = new \Swoole\Network\Server('0.0.0.0', 8888);
+$server->setProtocol($AppSvr);
+$server->daemonize(); //作为守护进程
+$server->run(array('worker_num' => 4, 'max_request' => 5000));
+    }}}
+这里26行，我们实例化了一个AppServer，32行我们实例化了一个Server，33行我们执行了该Server以AppServer协议方式运行。35行启动了该server。这就是整体的流程。这里在Server这个类的run方法中我们看到注册了我们上面看到的几个接口，并且传入了一个protocol对象，就是上面我们的AppServer，意思就是运行该类里面的这些实现。
+# `Server`: 
+{{{class="brush :php"
+    function run($setting = array())
+    {
+        $set = array_merge($this->swooleSetting, $setting);
+        swoole_server_set($this->sw, $set);
+        swoole_server_handler($this->sw, 'onWorkerStart', array($this->protocol, 'onStart'));
+        swoole_server_handler($this->sw, 'onConnect', array($this->protocol, 'onConnect'));
+        swoole_server_handler($this->sw, 'onReceive', array($this->protocol, 'onReceive'));
+        swoole_server_handler($this->sw, 'onClose', array($this->protocol, 'onClose'));
+        swoole_server_handler($this->sw, 'onWorkerStop', array($this->protocol, 'onShutdown'));
+        //swoole_server_handler($this->sw, 'onTimer', array($this->protocol, 'onReceive'));
+        swoole_server_start($this->sw);
+    }
+    }}}
+    这里所代表的意思就是，客户端每次请求都是取执行$this->protocol这个类里面的接口实现，即我们所说的Appserver这个类提供服务.我们称这个过程为注册回调函数，也叫注册实例。
+# `AppServer`:
+{{{class="brush :php"
+    function onRequest($request)
+    {
+        $response = new \Swoole\Response();
+        $php = \Swoole::getInstance();
+        $request->setGlobal();
+
+        if($this->doStaticRequest($request, $response))
+        {
+            return $response;
+        }
+        $mvc = $this->urlRouter($request->meta['path']);
+        $php->env['mvc'] = $mvc;
+        /*---------------------加载MVC程序----------------------*/
+        $controller_file = $this->config['apps']['apps_path'].'/controllers/'.$mvc['controller'].'.php';
+        if(!isset($php->env['controllers'][$mvc['controller']]))
+        {
+            if(is_file($controller_file))
+            {
+                \import_controller($mvc['controller'], $controller_file);
+            }
+            else
+            {
+                $this->http_error(404, $response, "控制器 <b>{$mvc['controller']}</b> 不存在!");
+                return $response;
+            }
+        }
+        //将对象赋值到控制器
+        $php->request = $request;
+        $php->response = $response;
+        var_dump($request);
+        /*---------------------检测代码是否更新----------------------*/
+        if(extension_loaded('runkit') and $this->config['apps']['auto_reload'])
+        {
+            clearstatcache();
+            $fstat = stat($controller_file);
+            //修改时间大于加载时的时间
+            if($fstat['mtime']>$php->env['controllers'][$mvc['controller']]['time'])
+            {
+                runkit_import($controller_file, RUNKIT_IMPORT_CLASS_METHODS|RUNKIT_IMPORT_OVERRIDE);
+                $php->env['controllers'][$mvc['controller']]['time'] = time();
+                $this->log("reload controller ".$mvc['controller']);
+            }
+        }
+        /*---------------------处理MVC----------------------*/
+        if(empty($mvc['param'])) $param = array();
+        else $param = $mvc['param'];
+
+        $response->head['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0';
+        $response->head['Pragma'] = 'no-cache';
+        try
+        {
+            $controller = new $mvc['controller']($php);
+            if(!method_exists($controller,$mvc['view']))
+            {
+                $this->http_error(404,$response,"视图 <b>{$mvc['controller']}->{$mvc['view']}</b> 不存在!");
+                return $response;
+            }
+            ob_start();
+            if($controller->is_ajax) $response->body = json_encode(call_user_func(array($controller,$mvc['view']),$param));
+            else $response->body = call_user_func(array($controller, $mvc['view']), $param);
+            $response->body .= ob_get_contents();
+            ob_end_clean();
+        }
+        catch(\Exception $e)
+        {
+            if($request->finish!=1) $this->http_error(404,$response,$e->getMessage());
+        }
+        //如果是代码请求
+        if($request->head['FlagServer']){
+        	$response->head['FlagServer']=$request->head['FlagServer'];
+        }
+        if(!isset($response->head['Content-Type']))
+        {
+            $response->head['Content-Type'] = 'text/html; charset='.$this->config['apps']['charset'];
+        }
+        //重定向
+        if(isset($response->head['Location']))
+        {
+            $response->send_http_status(301);
+        }
+        //保存Session
+        if($php->session->open and $php->session->readonly===false)
+        {
+            $php->session->save();
+        }
+        return $response;
+    }
+}}}
+该类继承了`HttpServer`，`HttpServer`里面是实现了这个上面注册的所有回调函数。其中`onRecive`里面调用了这里的`onRequest`,即该了一个名，原理还是没有变，所以当我们要自己实现服务类时，我们只需要专注于`onRecive`。这里我们增加了一个`FlagServer`标识，来标识是我们Mdaxue网内部提供的服务，即我们通过程序访问该服务，需要增加该Http头，否则就不是一个合法的请求，服务器会过滤掉该请求。我们也可以看到刚刚的`Mdaxue_Client.class.php`里面是增加了这个头的。也就是说要想使用该服务，必须在头文件中指定这个值，否则是不合法的请求，也就不提供服务。
+而且这里我们看到通过`runkit`热部署`MVC`里面的逻辑代码，即客户端可以通过请求不同的控制器和不同的方法，来完成不同的功能，这样一个用php实现的服务器就完成了。可以添加任意功能供客户端请求响应。
+----

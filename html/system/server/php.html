@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <!-- SyntaxHighlighter -->
+        <script src="../../../public/sh/scripts/shCore.js"></script>
+        <script src="../../../public/sh/scripts/shBrushAll.js"></script>
+        <link type="text/css" rel="stylesheet" href="../../../public/sh/styles/shCore.css"/>
+        <link type="text/css" rel="stylesheet" href="../../../public/sh/styles/shThemeMidnight.css"/>
+        <script>
+                SyntaxHighlighter.config.clipboardSwf = '../../../public/sh/scripts/clipboard.swf';
+                    SyntaxHighlighter.all();
+        </script>
+                <!-- 第一行是引入核心文件 -->
+                <!-- 第二行是引入语法高亮文件（可视需要书写多条，具体可查看 scripts 文件夹下的各个文件） -->
+                <!-- 更多语法高亮请访问 https://github.com/ruchee/backup2/tree/master/scripts 获取 -->
+                <!-- 第三行是引入基本 CSS 文件 -->
+                <!-- 第四行是指定使用的颜色主题（更多主题可查看 styles 文件夹） -->
+                <!-- ../../ 指代的是 HTML 代码根目录 -->
+        <title>php5.3.27的安装与配置</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="Stylesheet" type="text/css" href="../../../public/css/main.css" />
+        <!-- blog ico -->
+        <link type="image/x-icon" rel="icon" href="../../../public/images/ruchee.ico" />
+        <link type="image/x-icon" rel="shortcut icon" href="../../../public/images/ruchee.ico" />
+    </head>
+    <body>
+        <center style="font-family: 'Microsoft Yahei', sans-serif; font-size: 1.80em;
+            font-weight: normal; color: #FF6600">Mdaxue-Wiki</center><br />
+        <center>MdaxueWiki系统</center>
+
+
+        
+<h2 id="toc_0.1">php5.3.27的安装与配置</h2>
+<h3 id="toc_0.1.1">相关依赖安装</h3>
+<p>
+这里一开始并不准备很复杂的编译安装php，所以依赖关系相对较少，因为php完全可以在后期通过扩展的方式来增加php功能。这里只提前编译gd库。
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+tar zxvf gd-2.0.36RC1.tar.gz
+cd gd-2.0.36RC1
+./configure --enable-m4_pattern_allow  --prefix=/usr/local/gd  --with-jpeg=/usr/lib  --with-png=/usr/lib  --with-xpm=/usr/lib  --with-freetype=/usr/lib  --with-fontconfig=/usr/lib
+make
+make install
+</pre>
+<hr />
+<h3 id="toc_0.1.2">安装与配置</h3>
+<pre class="brush :bash">
+cd /usr/local/src
+tar -zvxf php-5.3.27.tar.gz
+cd php-5.3.27
+mkdir -p /usr/local/php5
+./configure --prefix=/usr/local/php5 --with-config-file-path=/usr/local/php5/etc --with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config --with-mysql-sock=/tmp/mysql.sock --with-pdo-mysql=/usr/local/mysql \
+--with-gd=/usr/local/gd  --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib --with-freetype-dir=/usr/lib --with-iconv \
+--with-zlib  --enable-xml --enable-magic-quotes --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem  \
+--enable-inline-optimization --with-curlwrappers --enable-mbregex  --enable-fpm --enable-mbstring --enable-ftp \
+--enable-gd-native-ttf --with-openssl --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap \
+--with-gettext --enable-session --with-mcrypt --with-curl --enable-ctype
+make
+make install
+cp php.ini-production /usr/local/php5/etc/php.ini
+rm -rf /etc/php.ini
+ln -s /usr/local/php5/etc/php.ini /etc/php.ini
+cp /usr/local/php5/etc/php-fpm.conf.default /usr/local/php5/etc/php-fpm.conf
+cp /usr/local/src/etc/php-fpm.conf /usr/local/php5/etc/php-fpm.conf     #这里的配置文件在哪里去概览里找
+cp /usr/local/src/php-5.3.27/sapi/fpm/init.d.php-fpm  /etc/rc.d/init.d/php-fpm
+chmod +x /etc/rc.d/init.d/php-fpm
+chkconfig php-fpm on
+cp /usr/local/src/etc/php.ini /usr/local/php5/etc/php.ini   #同上
+</pre>
+<hr />
+<h3 id="toc_0.1.3">php与nginx配置的整合</h3>
+<pre class="brush :bash">
+touch /tmp/php-cgi.sock
+chown www.www /tmp/php-cgi.sock
+cp /usr/local/src/etc/fcgi.conf /usr/local/nginx/conf/fcgi.conf
+mkdir /usr/local/nginx/conf/vhost
+cp /usr/local/src/etc/localhost.conf /usr/local/nginx/conf/vhost/localhost.conf
+</pre>
+<hr />
+<h3 id="toc_0.1.4">php扩展的编译与安装</h3>
+<p>
+php扩展安装也很简单，基本上流程都一样:<code>phpize</code>、<code>./configure</code> 、<code>make</code>、<code>make istall</code>即可。下面介绍的是生产上面正在跑的php扩展安装与配置。
+</p>
+<pre>
+    注意:下面的扩展你每一步最后都省略了将编译好的so文件加入到php.ini中。因为具有公共性，所以在此说明不要忘了编译好后加入php.ini
+</pre>
+<hr />
+<h4 id="toc_0.1.4.1">ZendGuardLoader</h4>
+<p>
+该扩展是一个php脚本优化加速引擎，是php官方加密和优化工具。
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+mkdir /usr/local/zend
+tar xvfz ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz
+cp ZendGuardLoader-php-5.3-linux-glibc23-x86_64/php-5.3.x/ZendGuardLoader.so /usr/local/zend/
+</pre>
+<hr />
+<h4 id="toc_0.1.4.2">ioncube</h4>
+<p>
+该扩展同ZendGuardLoader一样也是一个php加速工具。这个工具依赖与<code>re2c</code>词法语法分析器,具体介绍请参看php内核相关文档
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+tar -zxvf re2c-0.13.5.tar.gz
+cd re2c-0.13.5
+./configure
+make
+make install
+cd /usr/local/src
+tar zxvf ioncube_loaders_lin_x86-64.tar.gz
+mkdir /usr/local/ioncube
+cp -rf ioncube/*  /usr/local/ioncube
+</pre>
+<hr />
+<h4 id="toc_0.1.4.3">memcache</h4>
+<p>
+php对memcache的支持
+<hr />
+</p>
+<pre class="brush :bash">
+tar zxvf memcache-2.2.6.tgz
+cd memcache-2.2.6
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+</pre>
+<hr />
+<h4 id="toc_0.1.4.4">Redis</h4>
+<p>
+php对Redis的支持
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+tar zxvf phpredis-master.tar.gz
+cd phpredis-master
+/usr/local/php5/bin/phpize
+./configure --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+</pre>
+<hr />
+<h4 id="toc_0.1.4.5">suhosin</h4>
+<p>
+该扩展是对php脚本进行安全控制，增强php安全性，防止php脚本不安全造成的入侵，相关详细文档和配置可以自行google之
+<hr />
+</p>
+<pre class="brush :bash">
+cd suhosin-0.9.33
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+</pre>
+<hr />
+<h4 id="toc_0.1.4.6">ImageMagick</h4>
+<p>
+概扩展是比GD库效率更高的图片处理类库，推荐使用。这里要注意版本，配合才行，生产上是ImageMagick-6.7.9-3+imagick-3.0.1+MagickWandForPHP-1.0.8，这里后面两个都是扩展而已。
+<hr />
+</p>
+<pre class="brush :bash">
+###首先安装ImageMagick的二进制库，即C或C++的源代码进行编译安装
+cd /usr/local/src
+tar zxvf ImageMagick.tar.gz
+cd ImageMagick-6.7.9-3
+./configure --prefix=/usr/local/imagemagick
+make
+make install
+export PKG_CONFIG_PATH=/usr/local/imagemagick/lib/pkgconfig/
+###安装php ImageMagick的扩展支持
+cd /usr/local/src
+tar zxvf imagick-3.0.1.tgz
+cd imagick-3.0.1
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config --with-imagick=/usr/local/imagemagick
+make
+make install
+cd /usr/local/src
+tar zxvf MagickWandForPHP-1.0.8.tar.gz
+cd MagickWandForPHP-1.0.8
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config --with-magickwand=/usr/local/imagemagick
+make
+make install
+</pre>
+<hr />
+<h4 id="toc_0.1.4.7">beast</h4>
+<p>
+这是一个php加密模块，可以加密所有php脚本，前端时间因为安全问题，提高安全等级的时候把配置文件加密了，不过现在虽然启用，但是却没有脚本被加密，如果需要的话，可以用该组建加密任何php脚本，开源免费.
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+unzip php-beast.zip
+cd php-beast-master
+######修改beast.c中的authkey，将其改为mdaxueke 8为字符。最后面为原图和修改图
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+</pre>
+<hr />
+<p>
+<a href="{{../../../public/images/beastcode.jpg}}.html"><img src="../../../public/images/beastcode.jpg" /></a> <a href="{{../../../public/images/beastorigncode.jpg}}.html"><img src="../../../public/images/beastorigncode.jpg" /></a>
+<hr />
+</p>
+<h4 id="toc_0.1.4.8">fastdfs_client</h4>
+<p>
+详见 <a href="system/server/fastdfs.html">FastDfs4.0.6的配置与安装</a>
+<hr />
+</p>
+<h4 id="toc_0.1.4.9">runkit</h4>
+<p>
+这是一个配合下面的swoole进行热部署的扩展，简单的说就是，用这个扩展加载进来的文件，即会像Java一样编译进内存，这样即便是修改该文件也不会生效，甚至删除该文件也是可以的，他加载文件的函数是runkit_import()，具体的详细介绍可以参看该扩展的说明文档.
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+https://github.com/php/pecl-php-runkit.git
+cd pecl-php-runkit
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+</pre>
+<hr />
+<h4 id="toc_0.1.4.10">swoole</h4>
+<p>
+swoole是为了后期支持Mdaxue系统而选择的一款中间件，基于C编写，后端用php来编写服务端，一款高性能全堆栈的php扩展。可以用开发各种Server端来提供服务，这样提高了服务端编写的效率，也使编写服务端变得更加简单，因为php很简单，不必去学习复杂的C/C++或者Java了。
+<hr />
+</p>
+<pre class="brush :bash">
+cd /usr/local/src
+tar zxvf swoole.tar.gz
+cd swoole
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+</pre>
+<hr />
+<p>
+上面两个组件都只是简单进行了安装，具体的详细使用会在项目中详细说明。
+</p>
+
+
+
+        <center  style="font-family: 'Microsoft Yahei'; font-size: small; font-weight: normal; color: #009933">
+            Mdaxue&nbsp;&copy;&nbsp;2011-2013&nbsp;www.mdaxue.com<br/>
+            Generated by Vim and Vimwiki
+        </center>
+    </body>
+</html>

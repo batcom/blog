@@ -1,0 +1,445 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <!-- SyntaxHighlighter -->
+        <script src="../public/sh/scripts/shCore.js"></script>
+        <script src="../public/sh/scripts/shBrushAll.js"></script>
+        <link type="text/css" rel="stylesheet" href="../public/sh/styles/shCore.css"/>
+        <link type="text/css" rel="stylesheet" href="../public/sh/styles/shThemeMidnight.css"/>
+        <script>
+                SyntaxHighlighter.config.clipboardSwf = '../public/sh/scripts/clipboard.swf';
+                    SyntaxHighlighter.all();
+        </script>
+                <!-- 第一行是引入核心文件 -->
+                <!-- 第二行是引入语法高亮文件（可视需要书写多条，具体可查看 scripts 文件夹下的各个文件） -->
+                <!-- 更多语法高亮请访问 https://github.com/ruchee/backup2/tree/master/scripts 获取 -->
+                <!-- 第三行是引入基本 CSS 文件 -->
+                <!-- 第四行是指定使用的颜色主题（更多主题可查看 styles 文件夹） -->
+                <!--  指代的是 HTML 代码根目录 -->
+        <title>Mdaxue项目文档中心</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="Stylesheet" type="text/css" href="../public/css/main.css" />
+        <!-- blog ico -->
+        <link type="image/x-icon" rel="icon" href="../public/images/ruchee.ico" />
+        <link type="image/x-icon" rel="shortcut icon" href="../public/images/ruchee.ico" />
+    </head>
+    <body>
+        <center style="font-family: 'Microsoft Yahei', sans-serif; font-size: 1.80em;
+            font-weight: normal; color: #FF6600">Mdaxue-Wiki</center><br />
+        <center>MdaxueWiki系统</center>
+
+
+        
+<h2 id="toc_0.1">项目中心</h2>
+<hr />
+<h3 id="toc_0.1.1">Summary(概述)</h3>
+<p>
+这里为Mdaxue所有与项目有关的文档中心.因为Mdaxue系统是有Java、php等多种语言组成的系统，并且有多个模块，如<a href="http://bbs.mdaxue.com">论坛模块</a>,<a href="http://whu.mdaxue.com">分站模块</a> ,前者是php，后者是Java，而且一个模块，在MdaxueWiki里面被定义为一个项目，所以就有<code>bbs</code>,<code>org</code>等这些项目，为了和项目里面的模块区分开来，故我们将<code>bbs</code>等定义为项目.Mdaxue系统拥有的项目有:
+<table>
+<tr>
+<th>
+项目名
+</th>
+<th>
+语言
+</th>
+<th>
+服务器
+</th>
+<th>
+域名
+</th>
+<th>
+框架
+</th>
+</tr>
+<tr>
+<td>
+accounts
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+login.mdaxue.com
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+organize
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+org.mdaxue.com
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+wiki
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+wiki.mdaxue.com
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+bbs
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+bbs.mdaxue.com
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+shop
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+shop.mdaxue.com
+</td>
+<td>
+ECSHOP
+</td>
+</tr>
+<tr>
+<td>
+business
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+biz.mdaxue.com
+</td>
+<td>
+ECSHOP
+</td>
+</tr>
+<tr>
+<td>
+ask
+</td>
+<td>
+php
+</td>
+<td>
+101
+</td>
+<td>
+ask.mdaxue.com
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+home
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+www.mdaxue.com
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+game
+</td>
+<td>
+php
+</td>
+<td>
+101
+</td>
+<td>
+game.mdaxue.com
+</td>
+<td>
+THINKPHP
+</td>
+</tr>
+<tr>
+<td>
+mimi
+</td>
+<td>
+php
+</td>
+<td>
+101
+</td>
+<td>
+mimi.mdaxue.com
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+ios
+</td>
+<td>
+OC
+</td>
+<td>
+98
+</td>
+<td>
+客户端程序（无）
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+mdaxue
+</td>
+<td>
+Java
+</td>
+<td>
+98
+</td>
+<td>
+*.mdaxue.com
+</td>
+<td>
+S1SH
+</td>
+</tr>
+<tr>
+<td>
+mobile
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+手机端服务程序
+</td>
+<td>
+HDwiki
+</td>
+</tr>
+<tr>
+<td>
+xuepan
+</td>
+<td>
+php
+</td>
+<td>
+101
+</td>
+<td>
+pan.mdaxue.com
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+public
+</td>
+<td>
+php
+</td>
+<td>
+98
+</td>
+<td>
+public.mdaxue.com
+</td>
+<td>
+THINKPHP
+</td>
+</tr>
+<tr>
+<td>
+android
+</td>
+<td>
+Android
+</td>
+<td>
+98
+</td>
+<td>
+客户端程序
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+</table>
+所有组成Mdaxue系统的模块都必须在这里进行说明.
+</p>
+<pre>
+    注:以后的这里都指整个文档中心
+</pre>
+<p>
+说明<code>必须</code>包含：
+</p>
+<ol>
+<li>
+项目的整体架构.
+
+<ul>
+<li>
+项目所使用框架的详细说明文档。
+
+<li>
+该项目或框架所组成的环境的搭建，以及注意事项.
+
+<li>
+该项目的需求说明书.
+
+<li>
+该项目的整体设计流程说明书.
+
+<li>
+运行该项目的完整测试用例或者说明书.
+
+<li>
+该项目的详细数据库字典.
+
+</ul>
+<li>
+项目的依赖关系.如Nginx里的rewrite规则,php所依赖的扩展等.
+
+<li>
+组成该项目核心代码的详细说明，如:
+
+<ul>
+<li>
+极其重要的配置.
+
+<li>
+极其重要的类库或者公共库.
+
+<li>
+极其重要的性能优化,如Sql查询.
+
+<li>
+极其重要的代码优化,如清晰的代码分层,设计模式思路，代码重构合并等.
+
+</ul>
+<li>
+其它重要的说明
+
+</ol>
+<hr />
+<h3 id="toc_0.1.2">Repositories(项目仓库)</h3>
+<ol>
+<li>
+<a href="projects/accounts.html">accounts--Mdaxue登录模块</a>
+
+<li>
+<a href="projects/android.html">android--Mdaxue安卓客户端</a>
+
+<li>
+<a href="projects/ask.html">ask--Mdaxue问吧模块</a>
+
+<li>
+<a href="projects/bbs.html">bbs--Mdaxue论坛模块</a>
+
+<li>
+<a href="projects/business.html">business--Mdaxue商家模块</a>
+
+<li>
+<a href="projects/game.html">game--Mdaxue游戏模块</a>
+
+<li>
+<a href="projects/home.html">home--Mdaxue总站首页模块</a>
+
+<li>
+<a href="projects/ios.html">ios--Mdaxue IOS客户端</a>
+
+<li>
+<a href="projects/mdaxue.html">mdaxue--Mdaxue Java模块</a>
+
+<li>
+<a href="projects/mimi.html">mimi--Mdaxue密码模块</a>
+
+<li>
+<a href="projects/mobile.html">mobile--Mdaxue手机段服务模块</a>
+
+<li>
+<a href="projects/organize.html">organize--Mdaxue社团模块</a>
+
+<li>
+<a href="projects/public.html">public--Mdaxue公共模块模块</a>
+
+<li>
+<a href="projects/shop.html">shop--Mdaxue自营商城模块</a>
+
+<li>
+<a href="projects/wiki.html">wiki--Mdaxue百科模块</a>
+
+<li>
+<a href="projects/xuepan.html">xuepan--Mdaxue学盘模块</a>
+
+</ol>
+
+
+
+        <center  style="font-family: 'Microsoft Yahei'; font-size: small; font-weight: normal; color: #009933">
+            Mdaxue&nbsp;&copy;&nbsp;2011-2013&nbsp;www.mdaxue.com<br/>
+            Generated by Vim and Vimwiki
+        </center>
+    </body>
+</html>

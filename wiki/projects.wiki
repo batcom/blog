@@ -1,0 +1,60 @@
+%title Mdaxue项目文档中心
+==项目中心==
+----
+===Summary(概述)===
+这里为Mdaxue所有与项目有关的文档中心.因为Mdaxue系统是有Java、php等多种语言组成的系统，并且有多个模块，如[[http://bbs.mdaxue.com|论坛模块]],[[http://whu.mdaxue.com|分站模块]] ,前者是php，后者是Java，而且一个模块，在MdaxueWiki里面被定义为一个项目，所以就有`bbs`,`org`等这些项目，为了和项目里面的模块区分开来，故我们将`bbs`等定义为项目.Mdaxue系统拥有的项目有:
+| 项目名   | 语言    | 服务器 | 域名              | 框架     |
+|----------|---------|--------|-------------------|----------|
+| accounts | php     | 98     | login.mdaxue.com  | HDwiki   |
+| organize | php     | 98     | org.mdaxue.com    | HDwiki   |
+| wiki     | php     | 98     | wiki.mdaxue.com   | HDwiki   |
+| bbs      | php     | 98     | bbs.mdaxue.com    | HDwiki   |
+| shop     | php     | 98     | shop.mdaxue.com   | ECSHOP   |
+| business | php     | 98     | biz.mdaxue.com    | ECSHOP   |
+| ask      | php     | 101    | ask.mdaxue.com    |          |
+| home     | php     | 98     | www.mdaxue.com    | HDwiki   |
+| game     | php     | 101    | game.mdaxue.com   | THINKPHP |
+| mimi     | php     | 101    | mimi.mdaxue.com   |          |
+| ios      | OC      | 98     | 客户端程序（无）  |          |
+| mdaxue   | Java    | 98     | *.mdaxue.com      | S1SH     |
+| mobile   | php     | 98     | 手机端服务程序    | HDwiki   |
+| xuepan   | php     | 101    | pan.mdaxue.com    |          |
+| public   | php     | 98     | public.mdaxue.com | THINKPHP |
+| android  | Android | 98     | 客户端程序        |          |
+所有组成Mdaxue系统的模块都必须在这里进行说明.
+{{{
+    注:以后的这里都指整个文档中心
+    }}}
+说明`必须`包含：
+    # 项目的整体架构.
+        - 项目所使用框架的详细说明文档。
+        - 该项目或框架所组成的环境的搭建，以及注意事项.
+        - 该项目的需求说明书.
+        - 该项目的整体设计流程说明书.
+        - 运行该项目的完整测试用例或者说明书.
+        - 该项目的详细数据库字典.
+    # 项目的依赖关系.如Nginx里的rewrite规则,php所依赖的扩展等.
+    # 组成该项目核心代码的详细说明，如:
+        - 极其重要的配置.
+        - 极其重要的类库或者公共库.
+        - 极其重要的性能优化,如Sql查询.
+        - 极其重要的代码优化,如清晰的代码分层,设计模式思路，代码重构合并等.
+    # 其它重要的说明
+----
+===Repositories(项目仓库)===
+# [[projects/accounts|accounts--Mdaxue登录模块]]
+# [[projects/android|android--Mdaxue安卓客户端]]
+# [[projects/ask|ask--Mdaxue问吧模块]]
+# [[projects/bbs|bbs--Mdaxue论坛模块]]
+# [[projects/business|business--Mdaxue商家模块]]
+# [[projects/game|game--Mdaxue游戏模块]]
+# [[projects/home|home--Mdaxue总站首页模块]]
+# [[projects/ios|ios--Mdaxue IOS客户端]]
+# [[projects/mdaxue|mdaxue--Mdaxue Java模块]]
+# [[projects/mimi|mimi--Mdaxue密码模块]]
+# [[projects/mobile|mobile--Mdaxue手机段服务模块]]
+# [[projects/organize|organize--Mdaxue社团模块]]
+# [[projects/public|public--Mdaxue公共模块模块]]
+# [[projects/shop|shop--Mdaxue自营商城模块]]
+# [[projects/wiki|wiki--Mdaxue百科模块]]
+# [[projects/xuepan|xuepan--Mdaxue学盘模块]]
