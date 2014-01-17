@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block description %} {{ article.content | truncate(200)|escape}} {% endblock %}
+{% block keywords %} {{ article.tags | join(',') }} {% endblock %}
+{% block windowtitle %} {{ article.title }} | {{ SITENAME }}{% endblock %}
+{% block content %}
+    <div class='article'>
+        <div class="content-title">
+            <h1>{{ article.title }}</h1>
+            {% include "metadata.html" %}
+        </div>
+	
+        <div>{{ article.content }}</div>
+        {% include "footer_tag.html" %}
+        <hr>
+       
+        <h2>Comments</h2> {% include "twitter.html" %}
+	{% include 'disqus.html' %}
+    </div>
+{% endblock %}

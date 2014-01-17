@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>coolnet's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对PHP比较熟悉,也喜欢用PHP捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/PHP/Vim.">
+    <meta name="keywords" content="PHP, Linux, vim, 开源">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.blog.me/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="http://www.blog.me/shi-yong-linux-shellshi-shi-jian-ce-wen-jian-bian-geng.html"><h1>使用Linux shell实时检测文件变更</h1></a>
+五 18 五月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ 
+        </div>
+        
+        <div><p>使用python做web开发,现在流行使用uwsgi调用python程序,但是使用uwsgi一段时间发现有一个弊端,就是每次更改源代码后必须重启uwsgi才能生效,包括更改模板文件也是,我是个懒人,再经过一段时间反复的更改-重启后我终于忍受不了,决定写一个脚本来定时程序目录的文件改动,并及时自动重启uwsgi,来解放我的双手可以不用理会这些琐碎的重启工作. 用了点时间来编写了一个脚本用来判断是否更改,然后判断是否需要重启uwsgi.</p>
+<p>下面放出脚本内容:</p>
+<div class="highlight"><pre><span class="c">#!/bin/bash</span>
+<span class="c"># Author      : cold</span>
+<span class="c"># Homepage    : http://www.linuxzen.com</span>
+<span class="c"># Filename    : checkchange.sh</span>
+<span class="c"># Useage      : sh checkchange.sh [dir]</span>
+checkisdir<span class="o">()</span>
+        <span class="c"># Have one argument</span>
+        <span class="c"># The argument is a directory</span>
+        <span class="k">for </span>i in <span class="sb">`</span>ls <span class="nv">$1</span> | sed -e <span class="s1">&#39;s/ /\n/g&#39;</span><span class="sb">`</span>
+        <span class="k">do</span>
+<span class="k">                if</span> <span class="o">[</span> -d <span class="nv">$1</span>/<span class="nv">$i</span> <span class="o">]</span>
+                <span class="k">then</span>
+<span class="k">                        if</span> <span class="o">[</span> <span class="nv">$i</span> <span class="o">==</span> <span class="s2">&quot;bin&quot;</span> -o <span class="nv">$i</span> <span class="o">==</span> <span class="s2">&quot;lib&quot;</span> -o <span class="nv">$i</span> <span class="o">==</span> <span class="s2">&quot;include&quot;</span> <span class="o">]</span>   <span class="c"># 不想检测的目录(这里是使用virtualenv生成的环境文件)</span>
+                        <span class="k">then</span>
+<span class="k">                                continue</span>
+<span class="k">                        fi</span>
+<span class="k">                        </span><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$1/$i&quot;</span>
+                        checkisdir <span class="nv">$dir</span>
+                <span class="k">else</span>
+<span class="k">                        </span><span class="nv">files</span><span class="o">=</span><span class="nv">$files</span><span class="s1">&#39;\n&#39;</span><span class="nv">$1</span><span class="s1">&#39;/&#39;</span><span class="nv">$i</span>
+                <span class="k">fi</span>
+<span class="k">        done</span>
+<span class="k">        </span><span class="nb">echo</span> -e <span class="nv">$files</span>
+<span class="o">}</span>
+<span class="k">while </span><span class="nb">true</span>
+<span class="k">do</span>
+<span class="k">        if</span> <span class="o">[</span> -e /tmp/stat.tmp <span class="o">]</span>
+        <span class="k">then</span>
+<span class="k">                for </span>i in <span class="sb">`</span>checkisdir <span class="nv">$1</span><span class="sb">`</span>
+                <span class="k">do</span>
+<span class="k">                        if</span> <span class="o">[</span> -e /tmp/patch.tmp <span class="o">]</span>
+                        <span class="k">then</span>
+<span class="k">                                </span>stat <span class="nv">$i</span> | grep Change &gt; /tmp/nstat.tmp
+                                rm -f /tmp/patch.tmp
+                                <span class="k">continue</span>
+<span class="k">                        fi</span>
+<span class="k">                        </span>stat <span class="nv">$i</span> | grep Change &gt;&gt; /tmp/nstat.tmp
+                <span class="k">done</span>
+<span class="k">                </span>diff /tmp/stat.tmp /tmp/nstat.tmp &gt; /tmp/patch.tmp
+                <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq 0 <span class="o">]</span>
+                <span class="k">then</span>
+<span class="k">                        </span>sleep 10
+                <span class="k">else</span>
+                        /etc/init.d/uwsgi.py restart                    <span class="c"># 将此处更改为想要做的操作</span>
+                        patch /tmp/stat.tmp /tmp/patch.tmp
+                <span class="k">fi</span>
+<span class="k">        else</span>
+<span class="k">                for </span>i in <span class="sb">`</span>checkisdir <span class="nv">$1</span><span class="sb">`</span>
+                <span class="k">do</span>
+<span class="k">                        </span>stat <span class="nv">$i</span> | grep Change &gt;&gt; /tmp/stat.tmp
+                <span class="k">done</span>
+<span class="k">                continue</span>
+<span class="k">        fi</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<p>这里主要测试变更后重启uwsgi,使用方法:我的bottle程序在/code/python下:</p>
+<div class="highlight"><pre>sh checkchange.sh /code/python &amp;
+</pre></div>
+
+
+<p>如果使用svn可以参考下面代码:</p>
+<div class="highlight"><pre><span class="c">#!/bin/bash</span>
+<span class="c"># Author        : cold</span>
+<span class="c"># Homepage      : http://www.linuxzen.com</span>
+<span class="c"># Filename      : checkupdate.sh</span>
+<span class="c"># Describle     : To Check update of svn</span>
+
+<span class="k">while </span><span class="nb">true</span>
+<span class="k">do</span>
+<span class="k">        </span><span class="nb">cd</span> /code/python
+        svn up | grep At &gt; /dev/null 2&gt;&amp;1
+        <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq 0 <span class="o">]</span>
+        <span class="k">then</span>
+<span class="k">                </span>sleep 30
+        <span class="k">fi</span>
+
+<span class="k">        </span>svn up | grep Updated &gt; /dev/null 2&gt;&amp;1
+        <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq 0 <span class="o">]</span>
+        <span class="k">then</span>
+                /etc/init.d/uwsgi.py restart
+        <span class="k">fi</span>
+<span class="k">done</span>
+</pre></div></div>
+        <hr />
+    </div>
+		
+<div class="pagination">
+<ul>
+    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="active"><a href="http://www.blog.me/tag/wen-jian.html">1</a></li>
+
+    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.blog.me/archives.html">Archives</a>
+                <li><a href="http://www.blog.me/tags.html">Tags</a>
+                <li><a href="http://www.blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.blog.me/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.blog.me/category/git.html">git</a></li>
+                <li><a href="http://www.blog.me/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://www.blog.me/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.blog.me/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.blog.me/category/python.html">Python</a></li>
+                <li><a href="http://www.blog.me/category/shell.html">shell</a></li>
+                <li><a href="http://www.blog.me/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

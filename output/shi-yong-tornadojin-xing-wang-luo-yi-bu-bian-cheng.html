@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title> 使用Tornado进行网络异步编程 | coolnet's world</title>
+    <meta name="description" content=" &lt;h2&gt;Tornado&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;Tornado&lt;/code&gt; 是一款非阻塞可扩展的使用Python编写的web服务器和Python Web框架, ... ">
+    <meta name="keywords" content=" Python,tornado,网络,异步,编程 ">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.blog.me/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>使用Tornado进行网络异步编程</h1>
+一 15 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+        </div>
+	
+        <div><h2>Tornado</h2>
+<p><code>Tornado</code> 是一款非阻塞可扩展的使用Python编写的web服务器和Python Web框架, 可以使用<code>Tornado</code>编写Web程序并不依赖任何web服务器直接提供高效的web服务.所以<code>Tornado</code>不仅仅是一个web框架而且还是一款可以用于生产环境的高效的web服务器</p>
+<p>Torando 在Linux和FreeBSD上使用高效的异步I/O模型 <code>epoll</code> 和<code>kqueue</code>来实现高效的web服务器, 所以 tornado在Linux上和FreeBSD系列性能可以达到最高</p>
+<h2>接口</h2>
+<p>当然我们可以不仅仅把<code>Tornado</code>看作是一个web框架和web服务器, 我们可以利用<code>Tornado</code>提供的接口进行高效的网络异步编程,</p>
+<p><code>tornado.ioloop.IOLoop</code> 提供了三个接口可以用于网络编程:</p>
+<h3>add_handler</h3>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">add_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">stack_context</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_impl</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">events</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+</pre></div>
+
+
+<p><code>add_handler</code>用于添加socket到主循环中, 接受三个参数:
+<em> fd 是socket的文件描述符
+</em> handler 是处理此socket的 callback函数
+* events 是此socket注册的事件</p>
+<h3>update_handler</h3>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">update_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_impl</span><span class="o">.</span><span class="n">modify</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">events</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+</pre></div>
+
+
+<p><code>update_handler</code>用于更新住循环中已存在的socket响应事件, 接受两个参数:
+<em> fd 是socket对应的文件描述符
+</em> events 是注册的新事件</p>
+<h3>remove_handler</h3>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">remove_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_impl</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">gen_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Error deleting fd from IOLoop&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<p><code>remove_handler</code>用于移除主循环中已存在的socket</p>
+<h2>事件</h2>
+<p><code>tornado.ioloop.IOLoop</code>同时提供了4种响应事件:</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tornado.ioloop.IOLoop.NONE</td>
+<td>无事件</td>
+</tr>
+<tr>
+<td>tornado.ioloop.IOLoop.READ</td>
+<td>读事件</td>
+</tr>
+<tr>
+<td>tornado.ioloop.IOLoop.WRITE</td>
+<td>写事件</td>
+</tr>
+<tr>
+<td>tornado.ioloop.IOLoop.ERROR</td>
+<td>发生错误的事件</td>
+</tr>
+</tbody>
+</table>
+<h2>实例</h2>
+<p>根据上面的接口和事件我们就可以写出一个简单的 echo server</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding:utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c">#   Author  :   cold</span>
+<span class="c">#   E-mail  :   wh_linux@126.com</span>
+<span class="c">#   Date    :   13/04/15 15:08:51</span>
+<span class="c">#   Desc    :   Tornado Echo Server</span>
+<span class="c">#   HOME    :   http://www.linuxzen.com</span>
+<span class="c">#</span>
+<span class="kn">import</span> <span class="nn">Queue</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">tornado.ioloop</span> <span class="kn">import</span> <span class="n">IOLoop</span>
+
+<span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>              <span class="c"># 将socket设置为非阻塞</span>
+
+<span class="n">server_address</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">server_address</span><span class="p">)</span>
+<span class="n">sock</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">fd_map</span> <span class="o">=</span> <span class="p">{}</span>              <span class="c"># 文件描述符到socket的映射</span>
+<span class="n">message_queue_map</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c"># socket到消息队列的映射</span>
+
+<span class="n">fd</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+<span class="n">fd_map</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">sock</span>
+
+<span class="n">ioloop</span> <span class="o">=</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">handle_client</span><span class="p">(</span><span class="n">cli_addr</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">fd_map</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">&amp;</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">READ</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;     received &#39;</span><span class="si">%s</span><span class="s">&#39; from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cli_addr</span><span class="p">)</span>
+            <span class="c"># 接收到消息更改事件为写, 用于发送数据到对端</span>
+            <span class="n">ioloop</span><span class="o">.</span><span class="n">update_handler</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">WRITE</span><span class="p">)</span>
+            <span class="n">message_queue_map</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;     closing </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">cli_addr</span>
+            <span class="n">ioloop</span><span class="o">.</span><span class="n">remove_handler</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">message_queue_map</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">event</span> <span class="o">&amp;</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">WRITE</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">next_msg</span> <span class="o">=</span> <span class="n">message_queue_map</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> queue empty&quot;</span> <span class="o">%</span> <span class="n">cli_addr</span>
+            <span class="n">ioloop</span><span class="o">.</span><span class="n">update_handler</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">READ</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;sending &quot;</span><span class="si">%s</span><span class="s">&quot; to </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">next_msg</span><span class="p">,</span> <span class="n">cli_addr</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">next_msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">event</span> <span class="o">&amp;</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot; exception on </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">cli_addr</span>
+        <span class="n">ioloop</span><span class="o">.</span><span class="n">remove_handler</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">message_queue_map</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">handle_server</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">fd_map</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">event</span> <span class="o">&amp;</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">READ</span><span class="p">:</span>
+        <span class="n">conn</span><span class="p">,</span> <span class="n">cli_addr</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&quot;     connection </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">cli_addr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">conn_fd</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+        <span class="n">fd_map</span><span class="p">[</span><span class="n">conn_fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">handle_client</span><span class="p">,</span> <span class="n">cli_addr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c"># 将cli_addr作为第一个参数</span>
+        <span class="c"># 将连接和handle注册为读事件加入到 tornado ioloop</span>
+        <span class="n">ioloop</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">conn_fd</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">READ</span><span class="p">)</span>
+        <span class="n">message_queue_map</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span> <span class="o">=</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>   <span class="c"># 创建对应的消息队列</span>
+
+
+<span class="n">ioloop</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">handle_server</span><span class="p">,</span> <span class="n">IOLoop</span><span class="o">.</span><span class="n">READ</span><span class="p">)</span>
+
+<span class="n">ioloop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+
+
+<p>上面代码就建立了一个非阻塞的高效的异步的echo server</p></div>
+         <div class="footer">
+            <ul class="tags">                <li>
+                    <a href="http://www.blog.me/tag/python.html">Python</a>
+                </li>                <li>
+                    <a href="http://www.blog.me/tag/tornado.html">tornado</a>
+                </li>                <li>
+                    <a href="http://www.blog.me/tag/wang-luo.html">网络</a>
+                </li>                <li>
+                    <a href="http://www.blog.me/tag/yi-bu.html">异步</a>
+                </li>                <li>
+                    <a href="http://www.blog.me/tag/bian-cheng.html">编程</a>
+                </li>            </ul>
+        </div>
+        <hr>
+       
+        <h2>Comments</h2> <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'coolnet'; 
+    var disqus_title = '使用Tornado进行网络异步编程';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.blog.me/archives.html">Archives</a>
+                <li><a href="http://www.blog.me/tags.html">Tags</a>
+                <li><a href="http://www.blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.blog.me/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.blog.me/category/git.html">git</a></li>
+                <li><a href="http://www.blog.me/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://www.blog.me/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.blog.me/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.blog.me/category/python.html">Python</a></li>
+                <li><a href="http://www.blog.me/category/shell.html">shell</a></li>
+                <li><a href="http://www.blog.me/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

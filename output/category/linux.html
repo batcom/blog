@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>coolnet's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对PHP比较熟悉,也喜欢用PHP捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/PHP/Vim.">
+    <meta name="keywords" content="PHP, Linux, vim, 开源">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.blog.me/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="http://www.blog.me/php5327de-an-zhuang-yu-pei-zhi.html"><h1>php5.3.27的安装与配置</h1></a>
+五 17 一月 2014
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ 
+        </div>
+        
+        <div><p>==php5.3.27的安装与配置==
+===相关依赖安装===
+这里一开始并不准备很复杂的编译安装php，所以依赖关系相对较少，因为php完全可以在后期通过扩展的方式来增加php功能。这里只提前编译gd库。</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+tar zxvf gd-2.0.36RC1.tar.gz
+cd gd-2.0.36RC1
+./configure --enable-m4_pattern_allow  --prefix=/usr/local/gd  --with-jpeg=/usr/lib  --with-png=/usr/lib  --with-xpm=/usr/lib  --with-freetype=/usr/lib  --with-fontconfig=/usr/lib
+make
+make install
+    }}}</p>
+<hr />
+<p>===安装与配置===
+{{{class="brush :bash"
+cd /usr/local/src
+tar -zvxf php-5.3.27.tar.gz
+cd php-5.3.27
+mkdir -p /usr/local/php5
+./configure --prefix=/usr/local/php5 --with-config-file-path=/usr/local/php5/etc --with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config --with-mysql-sock=/tmp/mysql.sock --with-pdo-mysql=/usr/local/mysql \
+--with-gd=/usr/local/gd  --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib --with-freetype-dir=/usr/lib --with-iconv \
+--with-zlib  --enable-xml --enable-magic-quotes --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem  \
+--enable-inline-optimization --with-curlwrappers --enable-mbregex  --enable-fpm --enable-mbstring --enable-ftp \
+--enable-gd-native-ttf --with-openssl --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap \
+--with-gettext --enable-session --with-mcrypt --with-curl --enable-ctype
+make
+make install
+cp php.ini-production /usr/local/php5/etc/php.ini
+rm -rf /etc/php.ini
+ln -s /usr/local/php5/etc/php.ini /etc/php.ini
+cp /usr/local/php5/etc/php-fpm.conf.default /usr/local/php5/etc/php-fpm.conf
+cp /usr/local/src/etc/php-fpm.conf /usr/local/php5/etc/php-fpm.conf     #这里的配置文件在哪里去概览里找
+cp /usr/local/src/php-5.3.27/sapi/fpm/init.d.php-fpm  /etc/rc.d/init.d/php-fpm
+chmod +x /etc/rc.d/init.d/php-fpm
+chkconfig php-fpm on
+cp /usr/local/src/etc/php.ini /usr/local/php5/etc/php.ini   #同上
+    }}}</p>
+<hr />
+<p>===php与nginx配置的整合===
+{{{class="brush :bash"
+touch /tmp/php-cgi.sock
+chown www.www /tmp/php-cgi.sock
+cp /usr/local/src/etc/fcgi.conf /usr/local/nginx/conf/fcgi.conf
+mkdir /usr/local/nginx/conf/vhost
+cp /usr/local/src/etc/localhost.conf /usr/local/nginx/conf/vhost/localhost.conf
+}}}</p>
+<hr />
+<p>===php扩展的编译与安装===
+php扩展安装也很简单，基本上流程都一样:<code>phpize</code>、<code>./configure</code> 、<code>make</code>、<code>make istall</code>即可。下面介绍的是生产上面正在跑的php扩展安装与配置。
+{{{
+    注意:下面的扩展你每一步最后都省略了将编译好的so文件加入到php.ini中。因为具有公共性，所以在此说明不要忘了编译好后加入php.ini
+    }}}</p>
+<hr />
+<p>====ZendGuardLoader====
+该扩展是一个php脚本优化加速引擎，是php官方加密和优化工具。</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+mkdir /usr/local/zend
+tar xvfz ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz
+cp ZendGuardLoader-php-5.3-linux-glibc23-x86_64/php-5.3.x/ZendGuardLoader.so /usr/local/zend/
+}}}</p>
+<hr />
+<p>====ioncube====
+该扩展同ZendGuardLoader一样也是一个php加速工具。这个工具依赖与<code>re2c</code>词法语法分析器,具体介绍请参看php内核相关文档</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+tar -zxvf re2c-0.13.5.tar.gz
+cd re2c-0.13.5
+./configure
+make
+make install
+cd /usr/local/src
+tar zxvf ioncube_loaders_lin_x86-64.tar.gz
+mkdir /usr/local/ioncube
+cp -rf ioncube/*  /usr/local/ioncube
+    }}}</p>
+<hr />
+<p>====memcache====
+php对memcache的支持</p>
+<hr />
+<p>{{{class="brush :bash"
+tar zxvf memcache-2.2.6.tgz
+cd memcache-2.2.6
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+    }}}</p>
+<hr />
+<p>====Redis====
+php对Redis的支持</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+tar zxvf phpredis-master.tar.gz
+cd phpredis-master
+/usr/local/php5/bin/phpize
+./configure --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+    }}}</p>
+<hr />
+<p>====suhosin====
+该扩展是对php脚本进行安全控制，增强php安全性，防止php脚本不安全造成的入侵，相关详细文档和配置可以自行google之</p>
+<hr />
+<p>{{{class="brush :bash"
+cd suhosin-0.9.33
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make
+make install
+    }}}</p>
+<hr />
+<p>====ImageMagick====
+概扩展是比GD库效率更高的图片处理类库，推荐使用。这里要注意版本，配合才行，生产上是ImageMagick-6.7.9-3+imagick-3.0.1+MagickWandForPHP-1.0.8，这里后面两个都是扩展而已。</p>
+<hr />
+<p>{{{class="brush :bash"</p>
+<h3>首先安装ImageMagick的二进制库，即C或C++的源代码进行编译安装</h3>
+<p>cd /usr/local/src
+tar zxvf ImageMagick.tar.gz
+cd ImageMagick-6.7.9-3
+./configure --prefix=/usr/local/imagemagick
+make
+make install
+export PKG_CONFIG_PATH=/usr/local/imagemagick/lib/pkgconfig/</p>
+<h3>安装php ImageMagick的扩展支持</h3>
+<p>cd /usr/local/src
+tar zxvf imagick-3.0.1.tgz
+cd imagick-3.0.1
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config --with-imagick=/usr/local/imagemagick
+make
+make install
+cd /usr/local/src
+tar zxvf MagickWandForPHP-1.0.8.tar.gz
+cd MagickWandForPHP-1.0.8
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config --with-magickwand=/usr/local/imagemagick
+make
+make install
+    }}}</p>
+<hr />
+<p>====beast====
+这是一个php加密模块，可以加密所有php脚本，前端时间因为安全问题，提高安全等级的时候把配置文件加密了，不过现在虽然启用，但是却没有脚本被加密，如果需要的话，可以用该组建加密任何php脚本，开源免费.</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+unzip php-beast.zip
+cd php-beast-master</p>
+<h6>修改beast.c中的authkey，将其改为mdaxueke 8为字符。最后面为原图和修改图</h6>
+<p>/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+}}}</p>
+<hr />
+<h2>[[{{../../../public/images/beastcode.jpg}}]] [[{{../../../public/images/beastorigncode.jpg}}]]</h2>
+<p>====fastdfs_client====
+详见 [[system/server/fastdfs|FastDfs4.0.6的配置与安装]]</p>
+<hr />
+<p>====runkit====
+这是一个配合下面的swoole进行热部署的扩展，简单的说就是，用这个扩展加载进来的文件，即会像Java一样编译进内存，这样即便是修改该文件也不会生效，甚至删除该文件也是可以的，他加载文件的函数是runkit_import()，具体的详细介绍可以参看该扩展的说明文档.</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+https://github.com/php/pecl-php-runkit.git
+cd pecl-php-runkit
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+    }}}</p>
+<hr />
+<p>====swoole====
+swoole是为了后期支持Mdaxue系统而选择的一款中间件，基于C编写，后端用php来编写服务端，一款高性能全堆栈的php扩展。可以用开发各种Server端来提供服务，这样提高了服务端编写的效率，也使编写服务端变得更加简单，因为php很简单，不必去学习复杂的C/C++或者Java了。</p>
+<hr />
+<p>{{{class="brush :bash"
+cd /usr/local/src
+tar zxvf swoole.tar.gz
+cd swoole
+/usr/local/php5/bin/phpize
+./configure  --with-php-config=/usr/local/php5/bin/php-config
+make &amp;&amp; make install
+    }}}</p>
+<hr />
+<p>上面两个组件都只是简单进行了安装，具体的详细使用会在项目中详细说明。</p></div>
+        <hr />
+    </div>
+		
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/nginx126de-an-zhuang-yu-pei-zhi.html"><h2>Nginx1.2.6的安装与配置</h2></a>
+        <div class= "well small"> 五 17 一月 2014
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>==Nginx篇==
+这里讲述的是Nginx在CentOS平台的编译安装极其相关详细内容。因为是编译安装，所以
+这里虽然定义的是1.2.6,但是也适用于其它版本。
+===Nginx的编译安装===
+    ====相关模块的编译与安装====
+{{{ class="brush bash"</p>
+<h5>安装libmcrypt</h5>
+<p>cd /usr/local/src
+tar zxvf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8
+./configure
+make
+make install</p>
+<h5>安装cmake</h5>
+<p>cd /usr/local/src
+tar zxvf cmake-2.8.11.2.tar.gz
+cd cmake-2.8.11 ...</p> <a class="btn btn-info xsmall" href="http://www.blog.me/nginx126de-an-zhuang-yu-pei-zhi.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/grepwan-jiu-liao-wo-ge-xia-wu-hui-fu-rm-fshan-chu-de-dai-ma.html"><h2>grep挽救了我一个下午: 恢复rm -f删除的代码</h2></a>
+        <div class= "well small"> 四 25 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>今天对代码进行重构, 新添加了一个<code>logics.py</code>模块, 但并没有加入到git库中,  然后对代码进行清理, 有一个<code>logs</code>文件夹是不需要的所以我打算清掉它, 但是<code>zsh</code>将补全定位到<code>logics.py</code>, 手上的动作快过了脑子,直接按了回车, 做完心想完了, 一上午白费了, 还要花一下午的时间来重新写出这个代码, 虽然明知没有希望,但是我还是不想放弃, 于是就google一下有无解决办法,意外的是找到一篇文章:<a href="http://www.vpsee.com/2010/08/using-grep-to-recover-text-files/">用grep恢复误删的文本</a></p>
+<p>好吧虽然不知道能不能用, 但是我要试试, 因为我不想再花一个下午来重写这个模块, 我在模块里定义了一个<code>Logics</code>类并且上面差不多30行, 往下差不多300行的样子, 我删除<code>logics.py</code>所在的分区是<code>/dev/sda7</code>, 所以我运行了下面命令:</p>
+<div class="highlight"><pre>grep -a -B 50 -A 400 <span class="s2">&quot;class Logics(object):&quot;</span> /dev/sda7 ...</pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/grepwan-jiu-liao-wo-ge-xia-wu-hui-fu-rm-fshan-chu-de-dai-ma.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/awesometmuxgnomedoda-zao-gao-xiao-linuxzhuo-mian-huan-jing.html"><h2>Awesome+tmux+gnomeDo打造高效Linux桌面环境</h2></a>
+        <div class= "well small"> 二 04 十二月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>引言</h2>
+<p>近期一直在Linux下工作,使用Ubuntu 11.10,经过一段时间的使用和磨合,终于打造出一套适合自己的高效Linux桌面环境,之前也在博客中零散的写了几篇文章分享,在此做一番总结.</p>
+<p>首先先放出桌面截图
+<img alt="Awesome 桌面截图" src="/upload/MyDesktop.png" /></p>
+<h2>Awesome</h2>
+<p>使用Ubuntu 11.10不习惯默认搭载的Unity,Gnome 3也不尽人如意,也使用xfce/openbox,但使用都不是很好,没有Windows的体验好,然后接触了Awesome,Awesome是一款平铺式窗体管理器,Awesome会去除窗口的标题栏等.会使窗口尽量小的占用桌面空间,而且大部分窗口操作都可以通过键盘来进行操作,免除了各位身为键盘高手的码农们频繁拿鼠标的烦恼.</p>
+<h3>安装</h3>
+<p>Awesome Ubuntu下安装十分简单:</p>
+<div class="highlight"><pre>sudo apt-get install awesome
+</pre></div>
+
+
+<h3>配置</h3>
+<h4>拷贝配置文件</h4>
+<p>Awesome 的配置文件使用lua脚本,所以如果你会lua配置起来会得心应手,我们先拷贝一个基础配置文件,然后在这个基础上进行更改:</p>
+<div class="highlight"><pre>cp /etc/xdg/awesome/rc.lua ~/.config/awesome <span class="c">#  ~/.confg下如没有awesome则手动创建</span>
+</pre></div>
+
+
+<h4>配置自动启程序 ...</h4> <a class="btn btn-info xsmall" href="http://www.blog.me/awesometmuxgnomedoda-zao-gao-xiao-linuxzhuo-mian-huan-jing.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/apparmoryin-qi-de-wu-fa-qi-dong-evince.html"><h2>AppArmor引起的无法启动Evince</h2></a>
+        <div class= "well small"> 四 15 十一月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>今天在Ubuntu上使用文档查看器(Evince),总是打开没有响应,在命令行下使用命令:
+evince
+却提示:</p>
+<div class="highlight"><pre><span class="n">No</span> <span class="n">protocol</span> <span class="n">specified</span>
+<span class="n">Cannot</span> <span class="n">parse</span> <span class="n">arguments</span><span class="o">:</span> <span class="err">无法打开显示：</span>
+</pre></div>
+
+
+<p>google说是$XAUTHORITY权限的问题,于是查看:</p>
+<div class="highlight"><pre>ls -l <span class="nv">$XAUTHORITY</span>
+-rw------- 1 vim vim 51 2012-11-15 12:12 /data/home/vim/.Xauthority
+</pre></div>
+
+
+<p>更改为如下:</p>
+<div class="highlight"><pre>chmod +rw <span class="nv">$XAUTHORITY</span>
+</pre></div>
+
+
+<p>还是不行,这时候猛然想起查看日志,日志有如下一行:</p>
+<div class="highlight"><pre><span class="n">Nov</span> <span class="mi">15</span> <span class="mi">15</span><span class="o">:</span><span class="mi">48</span><span class="o">:</span><span class="mi">53</span> <span class="n">Vostro</span> <span class="n">kernel</span><span class="o">:</span> <span class="p">[</span><span class="mf">13010.203241</span><span class="p">]</span> <span class="n">type</span><span class="o">=</span><span class="mi">1400</span> <span class="n">audit ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/apparmoryin-qi-de-wu-fa-qi-dong-evince.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/linuxgao-xiao-gong-zuo-ping-pu-shi-chuang-ti-guan-li-qi-awesome.html"><h2>Linux高效工作----平铺式窗体管理器Awesome</h2></a>
+        <div class= "well small"> 四 25 十月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>在Linux桌面环境下开发,总想更高效的工作,我已经装备了Gnome Do和terminator,但是我还是觉得不够快我更加希望能解放右手(当然不是找个妹子戒撸,只是右手的鼠标),而且terminator在跑的东西过多的时候开多个terminator不太好管理,这时候一个词进入了我的眼睛平铺式窗体管理器,与传统窗体管理器不同的是平铺式窗体管理器的窗口不会重叠,窗口会被自动调整成正好铺满全屏的尺寸,也就是说无论开多少窗口都会把屏幕占满,如果想象力贫乏就装一个试试吧:</p>
+<p>Awesome是一款运行在Unix和类Unix(Linux/FreeBSD)等系统上的一款平铺式窗体管理器,有占用资源小,易于管理和操作等等有点,这里不罗嗦这些说说安装,Ubuntu安装很简单</p>
+<div class="highlight"><pre>sudo apt-get install awesome
+</pre></div>
+
+
+<p>安装好后登出会话选择awesome登录,然后你是否茫然无知没办法工作了?先简单介绍下使用方法:</p>
+<p>按<code>Win键+1~9</code>可以切换桌面,</p>
+<p>没有菜单对吧 其实再右上角点一下就会出来一个菜单,打开程序会发现标题栏状态栏什么都木有了大大节省了桌面空间,可问题来了,怎么关闭啊不用担心</p>
+<p>按 <code>Win键+Shift+C</code>可以关闭当前窗口</p>
+<p>打开默认终端 <code>Win键+Enter</code>就可以打开终端</p>
+<p>可以按住 <code>Win键+Shift ...</code></p> <a class="btn btn-info xsmall" href="http://www.blog.me/linuxgao-xiao-gong-zuo-ping-pu-shi-chuang-ti-guan-li-qi-awesome.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/bu-shu-tornadoshi-iptablesyin-fa-de-de-ge-wen-ti.html"><h2>部署Tornado时iptables引发的的一个问题</h2></a>
+        <div class= "well small"> 六 29 九月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>今天在CentOS上部署了一个Tornado,使用nginx做代理,</p>
+<p>tornado使用8888,端口,使用nginx作为反向代理,配置文件如下:</p>
+<div class="highlight"><pre><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">www.linuxzen.com</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="s">/</span> <span class="p">{</span>
+        <span class="kn">proxy_pass_header</span> <span class="s">Server</span><span class="p">;</span>
+        <span class="kn">proxy_redirect</span> <span class="no">off</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span> <span class="s">X-Real_IP</span> <span class="nv">$remote_addr</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span> <span class="s">X-Scheme</span> <span class="nv">$scheme</span><span class="p">;</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://127.0.0.1:8888</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>iptables filter表的INPUT链是DROP的,所以添加如下规则:</p>
+<div class="highlight"><pre>iptables -A INPUT -p tcp  -s 127.0.0.1 --dport 8888 -j ACCEPT
+</pre></div>
+
+
+<p>但是访问nginx总是返回502 Bad ...</p> <a class="btn btn-info xsmall" href="http://www.blog.me/bu-shu-tornadoshi-iptablesyin-fa-de-de-ge-wen-ti.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/linuxzhuo-mian-gao-xiao-gong-zuo-shi-yong-gnome-do.html"><h2>Linux桌面高效工作----使用Gnome DO</h2></a>
+        <div class= "well small"> 六 01 九月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>不知大家是否和我一样在win下系统win+r输入命令来快速启动程序,这两天在Linux下碰到一个比这更爽,更快的软件,<code>Gnome Do</code>.</p>
+<p>Gnome Do能根据用户键入的内容进行自动匹配，从而快速打开系统中已有的程序、文件、书签等。不仅如此，GNOME Do 还包括插件，从而能够做更多事,</p>
+<p>比如你安装了pidgin插件只需输入联系人的名字即可打开与他/她的会话,安装了file这个插件输入文件/目录的名字即可打开目录或文件,</p>
+<p>当然还有一个不足就是不支持中文</p>
+<p>ubuntu用户可以按照下面安装:</p>
+<div class="highlight"><pre>sudo apt-get install gnome-do
+</pre></div>
+
+
+<p>启动之后Gnome do不会停留任务栏或通知栏只需按<code>Win(ubuntu下称为super)+Space</code>即可启动,输入你想启动的应用程序名字即可打开/关闭等操作.是不是很酷提高不少的工作效率</p> <a class="btn btn-info xsmall" href="http://www.blog.me/linuxzhuo-mian-gao-xiao-gong-zuo-shi-yong-gnome-do.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/tui-jian-liang-kuan-bu-cuo-de-zhong-duan-ruan-jian.html"><h2>推荐两款不错的终端软件</h2></a>
+        <div class= "well small"> 三 29 八月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>一直在Linux下做开发,一个好用的终端软件能帮你节省很多时间和精力</p>
+<p>作为一个经常喜欢敲命令的人,可能要同时做很多操作,Linux各个桌面的窗口切换有多那啥,这里就不吐槽了,
+我总是在想要做另外一个操作,但又不想结束当前的工作,之前我习惯于再打开一个终端,但是后来终端越来越多导致我想找回原来的工作的时候就变的很费力,而且对桌面有洁癖的人不允许任务栏太杂
+后来发现了一款终端软件terminator,它支持分割终端,并可以在终端中快速切换.还有一款下拉式的终端软件Guake可以随意呼出隐藏.下面就一一介绍一下.</p>
+<h2>1 安装Terminator</h2>
+<div class="highlight"><pre>sudo apt-get install terminator
+</pre></div>
+
+
+<h2>2 使用</h2>
+<p>打开Termintor按<code>Ctrl-E</code>(注意是大E要按住Shift)可以垂直分割终端
+<code>Ctrl-O</code> 可水平分割终端
+按住Alt然后按上下左右可以在不同的分割窗中切换
+<code>Ctrl-D</code> 可以关闭分割窗</p>
+<h3>2.1 配置</h3>
+<p>terminator配置文件在<code>~/.config/terminator/config</code>
+可以通过这个配置文件配置<code>terminator</code>的字体和颜色</p>
+<div class="highlight"><pre><span class="n">font</span> <span class="o">=</span> <span class="n">Monaco</span> <span class="mi">10</span>  <span class="err">#设置体字</span>
+<span class="n">background_color</span> <span class="o">=</span> <span class="s">&quot;#204070&quot;</span> <span class="err">#</span> <span class="err">背景颜色 ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/tui-jian-liang-kuan-bu-cuo-de-zhong-duan-ruan-jian.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/sshzheng-shu-deng-lu-cuo-wu.html"><h2>ssh证书登录错误</h2></a>
+        <div class= "well small"> 五 10 八月 2012
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>错误描述</h2>
+
+<p>使用证书ssh链接的时候提示下面错误信息
+<h2><code>Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).</code>
+可能原因</h2>
+authorizedkeys 或.ssh的权限太open .ssh 目录改成755 权限 authorizedkeys 改成600
+<h2>解决</h2>
+查看日志:
+<code>cat /var/log/secure</code>
+发现
+<code>Aug 8 17:15:13 CentOS62 sshd[5624]: Authentication refused: bad ownership or modes for file /home/abc/.ssh/authorized_keys</code>
+查看.ssh权限为775
+.ssh 手动创建的时候是775权限,改成755权限后正常
+<code># chmod ...</code></p> <a class="btn btn-info xsmall" href="http://www.blog.me/sshzheng-shu-deng-lu-cuo-wu.html">read more</a></div>
+    </div>	
+				
+<div class="pagination">
+<ul>
+    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="active"><a href="http://www.blog.me/category/linux.html">1</a></li>
+    <li class=""><a href="http://www.blog.me/category/linux2.html">2</a></li>
+    <li class=""><a href="http://www.blog.me/category/linux3.html">3</a></li>
+
+    <li class="next"><a href="http://www.blog.me/category/linux2.html">Next &rarr;</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.blog.me/archives.html">Archives</a>
+                <li><a href="http://www.blog.me/tags.html">Tags</a>
+                <li><a href="http://www.blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.blog.me/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.blog.me/category/git.html">git</a></li>
+                <li><a href="http://www.blog.me/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://www.blog.me/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.blog.me/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.blog.me/category/python.html">Python</a></li>
+                <li><a href="http://www.blog.me/category/shell.html">shell</a></li>
+                <li><a href="http://www.blog.me/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

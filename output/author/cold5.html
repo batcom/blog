@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>cold's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对Python比较熟悉,也喜欢用Python捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/Python/Vim.">
+    <meta name="keywords" content="Python, Linux, vim, 开源">
+    <meta name="author" content="cold">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.linuxzen.com/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.linuxzen.com/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.linuxzen.com/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.linuxzen.com/theme/local.css" rel="stylesheet">
+    <link href="http://www.linuxzen.com/theme/tag.css" rel="stylesheet">
+    <link href="http://www.linuxzen.com/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.linuxzen.com">cold's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.linuxzen.com/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/yong-pythonjiang-jue-dui-urlti-huan-cheng-xiang-dui-url.html"><h2>用Python将绝对URL替换成相对URL</h2></a>
+        <div class= "well small"> 六 29 九月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>公司一个项目需要上传图片,一开始同事将图片上传后结合当前主机拼成了一个绝对的URL(<a href="#">http://192.168.1.1:888/m/getimg?filename=xxx.jpg</a>由于同时给手机终端提供接口,在手机终端会引起一些bug,改完代码后要求将以前的uri替换成相对的URL(/m/getimg?filename=xxx.jpg),由于图片是用img标签嵌入到内容同时用a标签括起显示大图的,所以需要读取数据库并对内容进行替换,</p>
+<p>脚本内容如下:</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding:utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c"># author  : cold night</span>
+<span class="c"># email   : wh_linux@126.com</span>
+<span class="c">#</span>
+
+<span class="kn">import</span> <span class="nn">pymongo</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">StringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">Connection</span><span class="p">()</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">conn ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/yong-pythonjiang-jue-dui-urlti-huan-cheng-xiang-dui-url.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/yong-pythondui-ge-chong-bian-cheng-yu-yan-jin-xing-dai-ma-gao-liang.html"><h2>用Python对各种编程语言进行代码高亮</h2></a>
+        <div class= "well small"> 六 29 九月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>做了一个在线代码高亮的项目,因为写的Gtalk群Bot需要这个功能支持,贴到第三方怕被人给封,所以干脆想自己写一个,强大的Python一如既往没让我失望,一个强大的Pygments模块可以对多种(很多)语言进行代码高亮</p>
+<p>下面来介绍一下它:</p>
+<p>首先安装很简单,使用easy_install来进行安装:</p>
+<div class="highlight"><pre>easy_install pygments
+</pre></div>
+
+
+<p>安装完后我们来使用,Python的简单不会让大家失望:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">pygments.lexers</span> <span class="kn">import</span> <span class="n">PythonLexver</span>
+<span class="kn">from</span> <span class="nn">pygments.formatters</span> <span class="kn">import</span> <span class="n">HtmlFormatter</span>
+<span class="kn">from</span> <span class="nn">pygments</span> <span class="kn">import</span> <span class="n">highlight</span>
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">HtmlFormatter</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">style</span> <span class="o">=</span> <span class="s">&#39;emacs&#39;</span><span class="p">,</span> <span class="n">linenos</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">code</span> <span class="o">=</span> <span class="n">highlight</span><span class="p">(</span><span class="s">&#39;print &quot;hello, world&quot;&#39;</span><span class="p">,</span> <span class="n">PythonLexer</span><span class="p">(),</span> <span class="n">formatter</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">code</span>
+</pre></div>
+
+
+<h5>结果</h5>
+<div class="highlight"><pre><span class="s1">&#39;&lt;table class=&quot;highlighttable ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/yong-pythondui-ge-chong-bian-cheng-yu-yan-jin-xing-dai-ma-gao-liang.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/python-you-ya-de-cao-zuo-zi-dian.html"><h2>Python 优雅的操作字典</h2></a>
+        <div class= "well small"> 一 17 九月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>Python 中的字典是Python中一个键值映射的数据结构,下面介绍一下如何优雅的操作字典.</p>
+<h2>1.1 创建字典</h2>
+<p>Python有两种方法可以创建字典,第一种是使用花括号,另一种是使用内建
+函数dict</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+</pre></div>
+
+
+<h2>1.2 初始化字典</h2>
+<p>Python可以在创建字典的时候初始化字典</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&#39;cold&#39;</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;cold&#39;</span><span class="p">)</span>       <span class="c"># 更优雅</span>
+</pre></div>
+
+
+<p>很明显第二种方法更加的优雅和减少一些特殊字符的输入,但是有种情况第二种不能胜任</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;name&#39;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span> <span class="p">:</span><span class="s">&#39;cold&#39;</span><span class="p">}</span>  <span class="c"># {&#39;name&#39;:&#39;cold&#39;}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="s">&#39;cold&#39;</span><span class="p">)</span> <span class="c"># {&#39;key&#39;: &#39;cold&#39;}</span>
+</pre></div>
+
+
+<p>明显第二种方法就会引发一个不容易找到的bug</p>
+<p>Python字典还有一种初始化方式,就是使用字典的fromkeys方法可以从列表中获取元素作为键并用None或fromkeys方法的第二个参数初始化</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;blog&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span>
+<span class="p">{</span><span class="s">&#39;blog&#39;</span><span class="p">:</span> <span class="bp">None ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/python-you-ya-de-cao-zuo-zi-dian.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/python-zi-dian-he-lie-biao-xian-jing.html"><h2>Python 字典和列表陷阱</h2></a>
+        <div class= "well small"> 一 17 九月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>Python 中有三个非常好用的数据结构,列表,元组和字典,
+元组是不可变的,列表可以保存任意类型的Python对象,并可以随意扩展没有大小限制,
+字典是一个key-value的键值映射的类型,可以存放任何Python对象,可以嵌套字典,
+值可以是字典元组或者字典</p>
+<p>这里说是Python 字典和列表的陷阱不如说是Python的一些特性,如果不了解这些特性
+就会引发一些难以寻找的bug</p>
+<p>下面我们来介绍这些特性</p>
+<p>Python中所有对列表和字典的使用仅仅是对原来对象的引用而不是创建一个新的对象
+如下面代码:</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;cold&#39;</span><span class="p">,</span> <span class="n">blog</span><span class="o">=</span><span class="s">&#39;www.linuxzen.com&#39;</span><span class="p">)</span> <span class="c"># 创建字典{&#39;name&#39;:&#39;cold&#39;, &#39;blog&#39;:&#39;www.linuxzen.com&#39;}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info2</span> <span class="o">=</span> <span class="n">info</span>     <span class="c"># 赋值给info2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info2</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;cold night&#39;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info2</span>
+<span class="p">{</span><span class="s">&#39;blog&#39;</span><span class="p">:</span> <span class="s">&#39;www.linuxzen.com&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;cold night&#39;</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">info ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/python-zi-dian-he-lie-biao-xian-jing.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/linuxzhuo-mian-gao-xiao-gong-zuo-shi-yong-gnome-do.html"><h2>Linux桌面高效工作----使用Gnome DO</h2></a>
+        <div class= "well small"> 六 01 九月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>不知大家是否和我一样在win下系统win+r输入命令来快速启动程序,这两天在Linux下碰到一个比这更爽,更快的软件,<code>Gnome Do</code>.</p>
+<p>Gnome Do能根据用户键入的内容进行自动匹配，从而快速打开系统中已有的程序、文件、书签等。不仅如此，GNOME Do 还包括插件，从而能够做更多事,</p>
+<p>比如你安装了pidgin插件只需输入联系人的名字即可打开与他/她的会话,安装了file这个插件输入文件/目录的名字即可打开目录或文件,</p>
+<p>当然还有一个不足就是不支持中文</p>
+<p>ubuntu用户可以按照下面安装:</p>
+<div class="highlight"><pre>sudo apt-get install gnome-do
+</pre></div>
+
+
+<p>启动之后Gnome do不会停留任务栏或通知栏只需按<code>Win(ubuntu下称为super)+Space</code>即可启动,输入你想启动的应用程序名字即可打开/关闭等操作.是不是很酷提高不少的工作效率</p> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/linuxzhuo-mian-gao-xiao-gong-zuo-shi-yong-gnome-do.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/tui-jian-liang-kuan-bu-cuo-de-zhong-duan-ruan-jian.html"><h2>推荐两款不错的终端软件</h2></a>
+        <div class= "well small"> 三 29 八月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>一直在Linux下做开发,一个好用的终端软件能帮你节省很多时间和精力</p>
+<p>作为一个经常喜欢敲命令的人,可能要同时做很多操作,Linux各个桌面的窗口切换有多那啥,这里就不吐槽了,
+我总是在想要做另外一个操作,但又不想结束当前的工作,之前我习惯于再打开一个终端,但是后来终端越来越多导致我想找回原来的工作的时候就变的很费力,而且对桌面有洁癖的人不允许任务栏太杂
+后来发现了一款终端软件terminator,它支持分割终端,并可以在终端中快速切换.还有一款下拉式的终端软件Guake可以随意呼出隐藏.下面就一一介绍一下.</p>
+<h2>1 安装Terminator</h2>
+<div class="highlight"><pre>sudo apt-get install terminator
+</pre></div>
+
+
+<h2>2 使用</h2>
+<p>打开Termintor按<code>Ctrl-E</code>(注意是大E要按住Shift)可以垂直分割终端
+<code>Ctrl-O</code> 可水平分割终端
+按住Alt然后按上下左右可以在不同的分割窗中切换
+<code>Ctrl-D</code> 可以关闭分割窗</p>
+<h3>2.1 配置</h3>
+<p>terminator配置文件在<code>~/.config/terminator/config</code>
+可以通过这个配置文件配置<code>terminator</code>的字体和颜色</p>
+<div class="highlight"><pre><span class="n">font</span> <span class="o">=</span> <span class="n">Monaco</span> <span class="mi">10</span>  <span class="err">#设置体字</span>
+<span class="n">background_color</span> <span class="o">=</span> <span class="s">&quot;#204070&quot;</span> <span class="err">#</span> <span class="err">背景颜色 ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/tui-jian-liang-kuan-bu-cuo-de-zhong-duan-ruan-jian.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/yong-bottlemongodbxie-de-blogcheng-xu-zhi-chi-mysqlla.html"><h2>用bottle+mongodb写的blog程序支持mysql啦</h2></a>
+        <div class= "well small"> 二 14 八月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>前面博文提到过,本人用bottle+mongodb实现了以blog程序,</p>
+<p>最近有些空闲时间,就重新用mvc的模式重写了一下,因为mongodb太过耗费内存,对一些小型的vps太过吃力所以加入了mysql的支持,</p>
+<p>虽然较上次有些完善,但是还是有很多不足代码放在了googlecode上,由于最近一直在使用git,索性也就新建了一个git的项目,之前svn的项目也会更新.</p>
+<p>所以大家想浏览代码可以到下面两个地方去,有什么不足和建议还请指教,如果你也想加入进来,可以留言或发email给我:</p>
+<p>git:<a href="http://code.google.com/p/linuxzen/source/browse/water">http://code.google.com/p/linuxzen/source/browse/water</a></p>
+<p>svn:http://code.google.com/p/sharepythoncode/source/browse/water/</p> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/yong-bottlemongodbxie-de-blogcheng-xu-zhi-chi-mysqlla.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/pythonli-de-san-mu-yun-suan.html"><h2>python里的三目运算</h2></a>
+        <div class= "well small"> 五 10 八月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>下面说的和三目运算有点相似,但又不一样,实在不知道该如何拟定标题,先就是这个标题吧,大家都知道python中没有三目运算,但是<code>and</code>/<code>or</code>有点类似三目运算:</p>
+<h2>and/or</h2>
+<p>单独使用表示逻辑关系与和或,也可以组和使用,用法如下</p>
+<h3>and</h3>
+<p>and前后如果某一个值为假(False, '', [], {}, None…)则返回第一个假值
+如果所有值都为真则返回最后一个真值</p>
+<h3>or</h3>
+<p>如果or任意一个值为真,则立刻返回这个值
+如果所有值都为假,则or返回最后一个假值</p>
+<h3>例子</h3>
+<div class="highlight"><pre><span class="n">result</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span> <span class="ow">and</span> <span class="bp">True</span> <span class="c"># result = True</span>
+<span class="n">result</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span> <span class="ow">and</span> <span class="s">&#39;ortest&#39;</span> <span class="c"># result = ortest</span>
+<span class="n">result</span> <span class="o">=</span> <span class="bp">False</span> <span class="ow">and</span> <span class="s">&#39;ortest&#39;</span> <span class="c"># result = False</span>
+<span class="n">result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="ow">and</span> <span class="bp">None</span>  <span class="c"># result = &#39;&#39;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="ow">or ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/pythonli-de-san-mu-yun-suan.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/python-duan-dian-diao-shi.html"><h2>Python 断点调试</h2></a>
+        <div class= "well small"> 五 10 八月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>pdb模块</h2>
+<p>pdb是一个Python 内置的调式模块这里用来介绍用它进行断点调试</p>
+<h3>插入断点</h3>
+<p>在需要插入断点的地方插入如下代码可以插入一个断点
+import pdb; pdb.set_trace()
+当Python执行到这条语句时在运行shell里就会中断执行出现一个类似下面的shell窗口</p>
+<div class="highlight"><pre><span class="o">&gt;</span> <span class="err">#</span> <span class="err">这里会出现当前运行程序的信息</span><span class="p">,</span><span class="err">源文件和当前函数</span>
+<span class="o">-&gt;</span> <span class="err">#</span> <span class="err">这里是将要运行的语句</span>
+ <span class="p">(</span><span class="n">Pdb</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>pdb指令</h3>
+<p>进入(Pdb)后有很多命令可以使用,可以使用 <code>h</code> 查看帮助</p>
+<ul>
+<li>l 查看代码上下文</li>
+<li>p var 监视变量var</li>
+<li>n 单步执行</li>
+<li>b line  在line行插入断点</li>
+<li>c 继续到下一个断点,没有则执行程序</li>
+<li>r 执行到函数返回前</li>
+</ul> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/python-duan-dian-diao-shi.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.linuxzen.com/sshzheng-shu-deng-lu-cuo-wu.html"><h2>ssh证书登录错误</h2></a>
+        <div class= "well small"> 五 10 八月 2012
+
+by <a class="url fn" href="http://www.linuxzen.com/author/cold.html">cold</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>错误描述</h2>
+
+<p>使用证书ssh链接的时候提示下面错误信息
+<h2><code>Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).</code>
+可能原因</h2>
+authorizedkeys 或.ssh的权限太open .ssh 目录改成755 权限 authorizedkeys 改成600
+<h2>解决</h2>
+查看日志:
+<code>cat /var/log/secure</code>
+发现
+<code>Aug 8 17:15:13 CentOS62 sshd[5624]: Authentication refused: bad ownership or modes for file /home/abc/.ssh/authorized_keys</code>
+查看.ssh权限为775
+.ssh 手动创建的时候是775权限,改成755权限后正常
+<code># chmod ...</code></p> <a class="btn btn-info xsmall" href="http://www.linuxzen.com/sshzheng-shu-deng-lu-cuo-wu.html">read more</a></div>
+    </div>	
+				
+<div class="pagination">
+<ul>
+    <li class="prev"><a href="http://www.linuxzen.com/author/cold4.html">&larr; Previous</a></li>
+
+    <li class=""><a href="http://www.linuxzen.com/author/cold.html">1</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold2.html">2</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold3.html">3</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold4.html">4</a></li>
+    <li class="active"><a href="http://www.linuxzen.com/author/cold5.html">5</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold6.html">6</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold7.html">7</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold8.html">8</a></li>
+    <li class=""><a href="http://www.linuxzen.com/author/cold9.html">9</a></li>
+
+    <li class="next"><a href="http://www.linuxzen.com/author/cold6.html">Next &rarr;</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.linuxzen.com/archives.html">Archives</a>
+                <li><a href="http://www.linuxzen.com/tags.html">Tags</a>
+                <li><a href="http://www.linuxzen.com/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.linuxzen.com/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.linuxzen.com/category/git.html">git</a></li>
+                <li><a href="http://www.linuxzen.com/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.linuxzen.com/category/linux.html">Linux</a></li>
+                <li><a href="http://www.linuxzen.com/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.linuxzen.com/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.linuxzen.com/category/python.html">Python</a></li>
+                <li><a href="http://www.linuxzen.com/category/shell.html">shell</a></li>
+                <li><a href="http://www.linuxzen.com/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.linuxzen.com">cold's world</a> &copy; cold 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/coldnight/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

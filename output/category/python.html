@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>coolnet's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对PHP比较熟悉,也喜欢用PHP捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/PHP/Vim.">
+    <meta name="keywords" content="PHP, Linux, vim, 开源">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.blog.me/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="http://www.blog.me/jiang-pelicanban-ben-geng-xin-dao-33.html"><h1>将Pelican版本更新到3.3</h1></a>
+二 24 十二月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/cold.html">cold</a>
+ 
+
+
+ 
+        </div>
+        
+        <div><p>用Pelican有一段时间了, 由于重装了系统, 所以安装<code>Pelican</code>的最新版本,最新版本为 <code>3.3</code>, 顺便也升级模板和插件.</p>
+<p><code>Pelican</code>特别喜欢更改配置文件,  而且错误提示非常烂, 完全不知道在说什么, 而且没有安装markdown包的话根本不提示, 仅仅就错误退出, 下面就这次升级越到的问题做个记录.</p>
+<h2>Makefile</h2>
+<p>Pelican升级后会有很多莫名奇妙的问题, 首先之前的<code>Makefile</code>不能使用, 所以需要重新生成一份:</p>
+<div class="highlight"><pre><span class="n">pelican</span><span class="o">-</span><span class="n">quickstart</span> <span class="p">.</span>
+</pre></div>
+
+
+<p>当然上面操作会更改配置文件, 我用git管理, 所以很方便的<code>checkout</code>, 如果你的不是, 先备份下配置文件吧.</p>
+<h2>ATOM Feed</h2>
+<p>然后<code>make html</code>的时候失败提示</p>
+<div class="highlight"><pre><span class="n">File</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">output</span><span class="o">/</span><span class="n">feeds</span><span class="o">/</span><span class="n">all</span><span class="p">.</span><span class="n">atom</span><span class="p">.</span><span class="n">xml</span> <span class="n">is</span> <span class="n">to</span> <span class="n">be</span> <span class="n">overwritten</span><span class="o">!</span>
+</pre></div>
+
+
+<p>看了 <a href="https://github.com/getpelican/pelican">pelican</a>上的<code>issue</code> 原来是更改了<code>FEED_ATOM</code>的配置项, 使用了 <code>FEED_ALL_ATOM</code>配置项, 将<code>FEED_ATOM</code>配置项改为<code>FEED_ALL_ATOM</code>配置即可</p>
+<p>但是改完之后页面的ATOM FEED链接没有指向正确的地址, 查看模板文件, 发现模板还在引用<code>FEED_ATOM</code>, 改成<code>FEED_ALL_ATOM</code>即可.</p>
+<h2>Markdown</h2>
+<p>如果莫名奇妙的错误, 没有错误信息, 也没有输出HTML, 那么可能就是<code>markdown</code>包没装, <code>Pelican</code>的错误提示真心无语.</p>
+<div class="highlight"><pre><span class="n">easy_install</span> <span class="o">-</span><span class="n">U</span> <span class="n">markdown</span>
+</pre></div>
+
+
+<h3>Markdown 代码高亮</h3>
+<p>Markdown 是通过指定 MD_EXTENSIONS 选项类配置代码高亮的之前配置这样就可以</p>
+<div class="highlight"><pre><span class="n">MD_EXTENSIONS</span> <span class="o">=</span>  <span class="p">([</span><span class="s">&#39;codehilite&#39;</span><span class="p">,</span> <span class="s">&#39;extra&#39;</span><span class="p">,</span> <span class="s">&#39;fenced_code&#39;</span><span class="p">,</span> <span class="s">&#39;tables&#39;</span><span class="p">,</span> <span class="s">&#39;sane_lists&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<p>但是发现现在无法高亮代码, 查看了源码原来要手动指定高亮 css, 不然css会设置成
+ codhilite 
+ <code>python
+MD_EXTENSIONS =  (['codehilite(css_class=highlight)', 'extra',
+                   'fenced_code', 'tables', 'sane_lists'])</code></p>
+<h2>静态文件</h2>
+<p><code>Pelican</code>去掉了<code>FILE\_TO\_COPY</code>项, 所以之前拷贝<code>robots.txt</code>之类的文件, 就会失效, 使用<code>STATIC_PATHS</code>即可</p>
+<div class="highlight"><pre><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="s">&quot;upload&quot;</span><span class="p">,</span> <span class="s">&quot;extra/robots.txt&quot;</span><span class="p">,</span>
+                <span class="s">&quot;extra/404.html&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+</pre></div>
+
+
+<p>如果想指定静态文件位置, 可以使用<code>STATIC_SAVE_AS</code>, 会将静态文件存到另外一个目录,
+而且对所有<code>STATIC_PATHS</code>项生效</p>
+<div class="highlight"><pre><span class="n">STATIC_SAVE_AS</span> <span class="o">=</span> <span class="s">&quot;static/&quot;</span>
+</pre></div>
+
+
+<p>也可以使用 <code>EXTRA_PATH_METADATA</code>来为每一项指定路径</p>
+<div class="highlight"><pre><span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;extra/robots.txt&quot;</span><span class="o">:</span><span class="p">{</span><span class="s">&quot;path&quot;</span><span class="o">:</span><span class="s">&quot;robots.txt&quot;</span><span class="p">},</span>
+    <span class="s">&quot;extra/404.html&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s">&quot;path&quot;</span><span class="o">:</span><span class="s">&quot;404.html&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>至此, <code>Pelican</code>升级完毕</p></div>
+        <hr />
+    </div>
+		
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/linux-xia-python-shi-xian-an-ren-yi-jian-tui-chu.html"><h2>Linux 下 Python 实现按任意键退出</h2></a>
+        <div class= "well small"> 二 20 八月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>初学Python时在总想实现一个按任意键继续/退出的程序(受.bat毒害), 奈何一直写不出来, 最近学习Unix C时发现可以通过<code>termios.h</code>库来实现, 尝试一下发现Python也有这个库, 所以终于写出一个这样的程序. 下面是代码:</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding:utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">termios</span>
+
+
+<span class="k">def</span> <span class="nf">press_any_key_exit</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="c"># 获取标准输入的描述符</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+
+    <span class="c"># 获取标准输入(终端)的设置</span>
+    <span class="n">old_ttyinfo</span> <span class="o">=</span> <span class="n">termios</span><span class="o">.</span><span class="n">tcgetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+    <span class="c"># 配置终端</span>
+    <span class="n">new_ttyinfo</span> <span class="o">=</span> <span class="n">old_ttyinfo</span><span class="p">[:]</span>
+
+    <span class="c"># 使用非规范模式(索引3是c_lflag 也就是本地模式)</span>
+    <span class="n">new_ttyinfo</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">termios</span><span class="o">.</span><span class="n">ICANON ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/linux-xia-python-shi-xian-an-ren-yi-jian-tui-chu.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/fa-bu-ge-ji-yu-tornadode-gao-xiao-yi-bu-de-httpke-hu-duan-ku.html"><h2>发布一个基于Tornado的高效异步的HTTP客户端库</h2></a>
+        <div class= "well small"> 四 01 八月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>前面的博文提到过<a href="/shi-yong-tornadojin-xing-wang-luo-yi-bu-bian-cheng.html">使用tornado进行网络异步编程</a>, 也<a href="/jie-yong-tornadoshi-xian-gao-xiao-de-webqqji-qi-ren.html">使用tornado实现了一个高效的WebQQ机器人</a>, 由于tornado内置的<code>AsyncHTTPClient</code>功能过于单一, 所以自己写了一个基于Tornado的HTTP客户端库, 鉴于自己多处使用了这个库, 所以从项目中提取出来, 写成一个单独库 <code>tornadohttpclient</code></p>
+<p><s>TornadoHTTPClient 是一个基于Tornado的高效的异步HTTP客户端库, 支持Cookie和代理, 目前仅在<code>Python2.7</code>平台上测试过, 不支持<code>Python3</code></s></p>
+<p>听取了仙子君的意见, 直接对<code>tornado.curl_httpclient.CurlAsyncHTTPClient</code>进行封装</p>
+<h2>安装</h2>
+<p>首先从git clone 下代码</p>
+<div class="highlight"><pre>git clone https://github.com/coldnight/tornadohttpclient.git
+</pre></div>
+
+
+<p>然后安装它</p>
+<div class="highlight"><pre><span class="nb">cd </span>tornadohttpclient
+python setup.py install
+</pre></div>
+
+
+<h2>教程</h2>
+<h3>GET</h3>
+<p>TornadoHTTPClient的get方法可以发起一个get请求</p>
+<div class="highlight"><pre><span class="kn">from ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/fa-bu-ge-ji-yu-tornadode-gao-xiao-yi-bu-de-httpke-hu-duan-ku.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/pual-geng-xin-zhi-chi-simsimike-yi-jin-xing-hu-dong.html"><h2>Pual 更新支持SimSimi可以进行互动</h2></a>
+        <div class= "well small"> 四 30 五月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p><a href="http://www.linuxzen.com/jie-yong-tornadoshi-xian-gao-xiao-de-webqqji-qi-ren.html">Pual</a> 跑了许久, 通过一段时间的修改现在Pual主要支持以下功能:</p>
+<ul>
+<li>英汉互译</li>
+<li>为每个用户分配一个session的含有上下文的Python shell</li>
+<li>贴代码</li>
+</ul>
+<hr />
+<p>总而言之就是一个被动型的辅助机器人, 群里有同学建议<code>AI</code>功能, 但是我水平不够没办法设计和实现<code>AI</code>部分, 所以想调用<code>SimSimi</code>实现<code>AI</code>, 发现官方Key才免费7天, 我这等穷苦人如何是买不起key的, google发现有一个非官方API可以调用, 但是被封了.但咱不是个容易放弃的人, 经过一番折腾非官方API可以正常调用, 所以Pual也有<code>AI</code>功能了, 只要在有Pual的群里发送<code>Pual</code>打头的消息 就可以和<code>Pual</code>互动</p>
+<p><a href="https://github.com/coldnight/pual_bot">项目地址</a></p>
+<p>Pual帐号是:1685359365, 大家可以先加好友回答验证问题:cold, 然后将它拉入群内进行调戏</p> <a class="btn btn-info xsmall" href="http://www.blog.me/pual-geng-xin-zhi-chi-simsimike-yi-jin-xing-hu-dong.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/shuo-shuo-pythonzhuang-shi-qi.html"><h2>说说Python装饰器</h2></a>
+        <div class= "well small"> 一 20 五月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>装饰器对与Python新手以至于熟悉Python的人都是一个难理解, 难写的东西. 那么今天就分享一下我对Python 装饰器的理解</p>
+<p>所谓装饰器仅仅是一种语法糖, 可作用的对象可以是函数也可以是类, 装饰器本身是一个函数, 其主要工作方式就是将被装饰的类或者函数当作参数传递给装饰器函数, 比如定义如下装饰器</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">run_time</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="k">return</span> <span class="n">r</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</pre></div>
+
+
+<p>我们用这个装饰器装饰一个<code>test</code>函数</p>
+<div class="highlight"><pre><span class="nd">@run_time</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s">&quot;just a test&quot;</span>
+</pre></div>
+
+
+<p>前面说过其实装饰器就是一个语法糖, 就是将被装饰的函数作为参数传递给装饰器函数, 所以上面可以展开为</p>
+<div class="highlight"><pre><span class="n">test</span> <span class="o">=</span> <span class="n">run_time</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+</pre></div>
+
+
+<p>装饰器将在解释器运行一开始就被加载 ...</p> <a class="btn btn-info xsmall" href="http://www.blog.me/shuo-shuo-pythonzhuang-shi-qi.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/clubotgeng-xin-shi-yong-sqlalchemyzhong-xie-shu-ju-ku-bu-fen-he-gai-yong-tornado-mainloop.html"><h2>clubot更新: 使用SQLAlchemy重写数据库部分和改用Tornado MainLoop</h2></a>
+        <div class= "well small"> 五 26 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p><a href="/python-shi-yong-pyxmpp2bian-xie-gtalkqun.html">clubot</a>在我的vps上跑了有一段时间了, 最近接触了<code>SQLAlchemy</code> 然后反观<code>clubot</code>的数据库代码部分, 感觉代码又遭有乱实在看不过眼, 所以就使用<code>SQLAlchemy</code>重写了数据库模块, 并将<code>epoll</code>的MainLoop改成<a href="http://lilydjwg.is-programmer.com/">仙子君</a>所写的<a href="https://github.com/lilydjwg/pyxmpp2">TornadoMainLoop</a></p>
+<h2>更新内容</h2>
+<ol>
+<li>数据库使用<code>SQLAlchemy</code>重写</li>
+<li><code>MainLoop</code>改用<code>TornadoMainLoop</code></li>
+<li>改变代码结构, 清理部分代码</li>
+<li>将<code>history</code>命令改为<code>old</code>, 并支持时间查询</li>
+<li>废弃一些不常用的命令</li>
+<li>改变数据库表结构</li>
+<li>废弃<code>channel</code>功能, <code>cd</code>命令仅支持切换聊天和安静模式</li>
+<li>删除一些不用的配置</li>
+</ol>
+<h2>如何升级</h2>
+<p>数据库表结构做了更改, 所以为了兼容之前的数据库本次表名前加上<code>clubot_</code>前缀, 并配以<code>update.py</code>脚本用以支持将旧的数据导入.</p>
+<h2>新的依赖</h2>
+<p>本次更新添加了依赖 ...</p> <a class="btn btn-info xsmall" href="http://www.blog.me/clubotgeng-xin-shi-yong-sqlalchemyzhong-xie-shu-ju-ku-bu-fen-he-gai-yong-tornado-mainloop.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/sqlalchemy-mysqlshu-ju-ku-luan-ma-jie-jue.html"><h2>SQLAlchemy MySQL数据库乱码解决</h2></a>
+        <div class= "well small"> 五 26 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>今天对<a href="/python-shi-yong-pyxmpp2bian-xie-gtalkqun.html">clubot</a>进行了<a href="/clubotgeng-xin-shi-yong-sqlalchemyzhong-xie-shu-ju-ku-bu-fen-he-gai-yong-tornado-mainloop.html">升级</a>, 但是导入数据后中文乱码, 一开是找资料说是在创建引擎的时候添加编码信息:</p>
+<div class="highlight"><pre><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">&quot;mysql://root:@localhost:3306/clubot?charset=utf8&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>但是这并不行, 然后查看表信息:</p>
+<div class="highlight"><pre><span class="o">&gt;</span> <span class="k">show</span> <span class="k">create</span> <span class="k">table</span> <span class="n">clubot_members</span><span class="p">;</span>
+<span class="n">clubot_members</span> <span class="o">|</span> <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="ss">`clubot_members`</span> <span class="p">(</span>
+  <span class="ss">`id`</span> <span class="kt">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span> <span class="kp">AUTO_INCREMENT</span><span class="p">,</span>
+  <span class="ss">`email`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="no">NULL</span><span class="p">,</span>
+  <span class="ss">`nick`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="no">NULL</span><span class="p">,</span>
+  <span class="ss">`last_say`</span> <span class="kt">timestamp</span> <span class="no">NULL</span> <span class="k">DEFAULT</span> <span class="no">NULL</span><span class="p">,</span>
+  <span class="ss">`last_change`</span> <span class="kt">timestamp</span> <span class="no">NULL</span> <span class="k">DEFAULT ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/sqlalchemy-mysqlshu-ju-ku-luan-ma-jie-jue.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/jie-yong-tornadoshi-xian-gao-xiao-de-webqqji-qi-ren.html"><h2>借用Tornado实现高效的WebQQ机器人</h2></a>
+        <div class= "well small"> 二 23 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>之前有写过一篇文章介绍使用<code>Pyxmpp2</code>桥接QQ和xmpp的文章(<a href="/shi-yong-webqqxie-yi-qiao-jie-xmpphe-qqqun.html">这里</a>).后来我打算将WebQQ单独出来运行, 一开始直接拷贝了<code>pyxmpp2</code>的mainloop, 但是跑起来问题多多, 所以我又研究了利用<code>Tornado</code>进行网络编程(<a href="/shi-yong-tornadojin-xing-wang-luo-yi-bu-bian-cheng.html">这里</a>), 所以我放弃了<code>Pyxmpp2</code>的mainloop,使用<code>Tornado</code>进行重写</p>
+<p>首先放出<a href="https://github.com/coldnight/pual_bot">项目代码</a></p>
+<h2>引子</h2>
+<p>WebQQ协议是一套基于<code>HTTP</code>的QQ协议, 而用<code>Python</code>的<code>urllib2</code>库进行请求太慢, 因为HTTP本身就使用socket请求, 所以改用多路复用I/O模型, 而<code>Tornado</code>简单高效, 看过代码后可以轻松上手.平台兼容性很好, 所以选择<code>Tornado</code>作为网络框架.</p>
+<h2>原理</h2>
+<p>首先实现了一个 <code>HTTPStream</code>类, 其主要接口是<code>add_request</code>方法, 它接受一个必选参数:<code>request ...</code></p> <a class="btn btn-info xsmall" href="http://www.blog.me/jie-yong-tornadoshi-xian-gao-xiao-de-webqqji-qi-ren.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/shi-yong-pelicanda-zao-jing-tai-bo-ke.html"><h2>使用Pelican打造静态博客</h2></a>
+        <div class= "well small"> 四 18 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>前面有文章介绍本站采用了<code>Python</code>编写的<code>Pelican</code>静态生成博客系统, 之所以没有使用当前很火的<code>Jekyll</code>, 是因为它是<code>Ruby</code>编写, 而我又对<code>Ruby</code>没有啥兴趣, 所以还是选择了使用了我熟悉的Python编写的这套系统, 我用了一段时间,打算将使用经验分享出来</p>
+<h2>介绍</h2>
+<p><code>Pelican</code>是一套开源的使用Python编写的博客静态生成, 可以添加文章和和创建页面, 可以使用<code>MarkDown</code> <code>reStructuredText</code> 和 <code>AsiiDoc</code> 的格式来抒写, 同时使用 <code>Disqus</code>评论系统, 支持 <code>RSS</code>和<code>Atom</code>输出, 插件, 主题, 代码高亮等功能, 采用<code>Jajin2</code>模板引擎, 可以很容易的更改模板</p>
+<h2>安装</h2>
+<p>可以从<code>github</code>克隆最新的代码安装, 并且建议在<code>virtualenv</code>下使用:</p>
+<h3>建立 virtualenv ...</h3> <a class="btn btn-info xsmall" href="http://www.blog.me/shi-yong-pelicanda-zao-jing-tai-bo-ke.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://www.blog.me/shi-yong-tornadojin-xing-wang-luo-yi-bu-bian-cheng.html"><h2>使用Tornado进行网络异步编程</h2></a>
+        <div class= "well small"> 一 15 四月 2013
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>Tornado</h2>
+<p><code>Tornado</code> 是一款非阻塞可扩展的使用Python编写的web服务器和Python Web框架, 可以使用<code>Tornado</code>编写Web程序并不依赖任何web服务器直接提供高效的web服务.所以<code>Tornado</code>不仅仅是一个web框架而且还是一款可以用于生产环境的高效的web服务器</p>
+<p>Torando 在Linux和FreeBSD上使用高效的异步I/O模型 <code>epoll</code> 和<code>kqueue</code>来实现高效的web服务器, 所以 tornado在Linux上和FreeBSD系列性能可以达到最高</p>
+<h2>接口</h2>
+<p>当然我们可以不仅仅把<code>Tornado</code>看作是一个web框架和web服务器, 我们可以利用<code>Tornado</code>提供的接口进行高效的网络异步编程,</p>
+<p><code>tornado.ioloop.IOLoop</code> 提供了三个接口可以用于网络编程:</p>
+<h3>add_handler</h3>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">add_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">stack_context</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_impl</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">events</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERROR ...</span></pre></div> <a class="btn btn-info xsmall" href="http://www.blog.me/shi-yong-tornadojin-xing-wang-luo-yi-bu-bian-cheng.html">read more</a></div>
+    </div>	
+				
+<div class="pagination">
+<ul>
+    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="active"><a href="http://www.blog.me/category/python.html">1</a></li>
+    <li class=""><a href="http://www.blog.me/category/python2.html">2</a></li>
+    <li class=""><a href="http://www.blog.me/category/python3.html">3</a></li>
+    <li class=""><a href="http://www.blog.me/category/python4.html">4</a></li>
+
+    <li class="next"><a href="http://www.blog.me/category/python2.html">Next &rarr;</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.blog.me/archives.html">Archives</a>
+                <li><a href="http://www.blog.me/tags.html">Tags</a>
+                <li><a href="http://www.blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.blog.me/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.blog.me/category/git.html">git</a></li>
+                <li><a href="http://www.blog.me/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://www.blog.me/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.blog.me/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.blog.me/category/python.html">Python</a></li>
+                <li><a href="http://www.blog.me/category/shell.html">shell</a></li>
+                <li><a href="http://www.blog.me/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

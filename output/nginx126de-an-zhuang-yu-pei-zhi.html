@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title> Nginx1.2.6的安装与配置 | coolnet's world</title>
+    <meta name="description" content=" &lt;p&gt;==Nginx篇==
+这里讲述的是Nginx在CentOS平台的编译安装极其相关详细内容。因为是编译安装，所以
+这里虽然定义的是1.2.6,但是也适用于其它版本。
+===Nginx的编译安装===
+    ====相关模块的编译与安装====
+{{{ class=&#34;brush bash&#34;&lt;/p&gt;
+&lt;h5&gt;安装libmcrypt&lt;/h5&gt;
+&lt;p&gt;cd /usr/local/src
+tar ... ">
+    <meta name="keywords" content=" Wiki ">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://www.blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://www.blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://www.blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://www.blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+            <li><a href="http://www.blog.me/pages/about.html">About</a></li>
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>Nginx1.2.6的安装与配置</h1>
+五 17 一月 2014
+
+by <a class="url fn" href="http://www.blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+        </div>
+	
+        <div><p>==Nginx篇==
+这里讲述的是Nginx在CentOS平台的编译安装极其相关详细内容。因为是编译安装，所以
+这里虽然定义的是1.2.6,但是也适用于其它版本。
+===Nginx的编译安装===
+    ====相关模块的编译与安装====
+{{{ class="brush bash"</p>
+<h5>安装libmcrypt</h5>
+<p>cd /usr/local/src
+tar zxvf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8
+./configure
+make
+make install</p>
+<h5>安装cmake</h5>
+<p>cd /usr/local/src
+tar zxvf cmake-2.8.11.2.tar.gz
+cd cmake-2.8.11.2
+./configure
+make
+make install</p>
+<h5>安装pcre</h5>
+<p>cd /usr/local/src
+mkdir /usr/local/pcre
+tar zxvf pcre-8.33.tar.gz
+cd pcre-8.33 
+./configure --prefix=/usr/local/pcre
+make
+make install</p>
+<h5>安装libunwind</h5>
+<p>cd /usr/local/src
+tar zxvf libunwind-1.1.tar.gz
+cd libunwind-1.1
+./configure
+make
+make install</p>
+<h5>安装gperftools优化工具</h5>
+<p>cd /usr/local/src
+tar zxvf gperftools-2.0.tar.gz
+cd gperftools-2.0
+./configure --enable-frame-pointers
+make
+make install
+echo -e "/usr/local/lib" &gt; /etc/ld.so.conf.d/usr_local_lib.conf
+/sbin/ldconfig
+    }}}</p>
+<hr />
+<p>===添加用户和组===
+{{{
+groupadd www
+useradd -g www www -s /bin/false
+}}}</p>
+<hr />
+<p>===Nginx1.2.6的编译安装===
+{{{class="brush :bash"
+    cd /usr/local/src
+    tar zxvf nginx-1.2.6.tar.gz
+    cd nginx-1.2.6
+    ./configure --prefix=/usr/local/nginx --with-google_perftools_module \
+    --without-http_memcached_module --user=www --group=www --with-http_stub_status_module \
+    --with-openssl=/usr/ --with-pcre=/usr/local/src/pcre-8.33
+    make
+    make install
+    mkdir /tmp/tcmalloc
+    chmod  777 /tmp/tcmalloc -R
+    /usr/local/nginx/sbin/nginx
+    ####这里的etc/nginx在前面服务器大纲里面详细定义了的，以后凡是遇到这再也的配置文件不再多说了，直接去Packages里面etc里找
+    cp /usr/local/src/etc/nginx  /etc/rc.d/init.d/nginx
+    chmod 775 /etc/rc.d/init.d/nginx
+    chkconfig nginx on
+    /etc/rc.d/init.d/nginx restart
+    }}}</p>
+<hr />
+<p>===Nginx扩展模块的安装===
+Nginx扩展模块代表这给Nginx增加新的功能，如图片缩放,FastDfs等，它的模块是非常丰富的，很多事情其实都可以用Nginx简单来实现，我们这里主要介绍生产服务器上面的在使用的扩展模块的安装，Nginx因为架构好，所以安装模块也都一样，也很简单，演示一个其它的也都如此安装即可。</p>
+<hr />
+<div class="highlight"><pre><span class="cp"># `安装任何模块之前`: 应该先获取当前正在运行的Nginx进程的配置信息。方法为:`/usr/local/nginx/sbin/nginx -V`,执行此命令后你会看见`./configure`的回显,然后你只需要在此之后增加所需要的信息，如`--add-module=/usr/local/src/nginx-http-concat --with-http_image_filter_module`,重新编译即可.</span>
+<span class="cp"># `安装任何模块之后`:需要执行Nginx的平滑升级。平滑升级简单理解就是Nginx二进制可执行文件发生变化后，在不影响服务的前提下切换为新版本的Nginx服务。</span>
+    <span class="p">{{{</span><span class="n">class</span><span class="o">=</span><span class="s">&quot;brush :bash&quot;</span>
+        <span class="err">#</span><span class="mf">1.</span><span class="err">备份旧的</span><span class="n">Nginx</span><span class="err">可执行文件</span><span class="p">,</span><span class="err">复制编译生成的</span><span class="n">Nginx</span><span class="err">执行文件</span>
+        <span class="n">mv</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">old</span>
+        <span class="n">cp</span> <span class="n">objs</span><span class="o">/</span><span class="n">nginx</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span>    <span class="err">#</span><span class="n">objs</span><span class="err">是在</span><span class="n">Nginx</span><span class="err">源码文件下</span>
+        <span class="err">#</span><span class="mf">2.</span><span class="err">测试新版本的</span><span class="n">Nginx</span><span class="err">是否正常</span>
+        <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">c</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">conf</span>
+        <span class="err">#</span><span class="mf">3.</span><span class="err">平滑升级</span><span class="n">Nginx</span>
+        <span class="n">kill</span> <span class="o">-</span><span class="n">USR2</span> <span class="err">`</span><span class="n">cat</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">logs</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">pid</span><span class="err">`</span>
+        <span class="err">#此时旧版本的</span><span class="n">Nginx</span> <span class="n">pid</span><span class="err">变为</span><span class="n">oldbin</span><span class="err">，这是旧版本和新版本的</span><span class="n">Nginx</span><span class="err">同时运行，过一段时间等旧</span><span class="n">Nginx</span><span class="err">处理完用户请求后，执行下面操作</span>
+        <span class="err">#</span><span class="mf">4.</span><span class="err">从容关闭旧版本的</span><span class="n">Nginx</span><span class="err">工作进程</span>
+        <span class="n">kill</span> <span class="o">-</span><span class="n">WINCH</span> <span class="err">`</span><span class="n">cat</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">logs</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">pid</span><span class="p">.</span><span class="n">oldbin</span><span class="err">`</span>
+        <span class="err">#</span><span class="mf">5.</span><span class="err">决定是否升级到新的</span><span class="n">Nginx</span>
+        <span class="n">kill</span> <span class="o">-</span><span class="n">HUP</span> <span class="err">`</span><span class="n">cat</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">logs</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">pid</span><span class="p">.</span><span class="n">oldbin</span><span class="err">`</span>
+        <span class="n">kill</span> <span class="o">-</span><span class="n">QUIT</span> <span class="err">`</span><span class="n">cat</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">logs</span><span class="o">/</span><span class="n">nginx</span><span class="p">.</span><span class="n">pid</span><span class="p">.</span><span class="n">oldbin</span><span class="err">`</span>
+        <span class="p">}}}</span>
+</pre></div>
+
+
+<hr />
+<p>====图片缩放模块的安装====
+{{{class="brush :bash"
+    cd /usr/local/src/
+    cd nginx-1.2.6
+    ./configure --prefix=/usr/local/nginx --with-google_perftools_module --without-http_memcached_module \
+    --user=www --group=www --with-http_stub_status_module --with-openssl=/usr/ \
+    --with-pcre=/usr/local/src/pcre-8.33 --with-http_image_filter_module
+    make
+    }}}</p>
+<hr />
+<p>====Http-concat模块的安装====
+此模块是用来减少一个页面静态文件的请求数目，如一个页面有a.js、b.js、a.css、b.css、c.css两个js文件和3个css文件，如果不使用该模块，则每次都会向服务器发送5个http请求，而用http-concat合并后就是需要发送2个请求了，是一向很好的性能优化.
+简单的用法示例:
+{{{
+    http://example.com/??style1.css,style2.css,foo/style3.css?v=102234</p>
+<h2>Configuration example</h2>
+<div class="highlight"><pre><span class="n">location</span> <span class="o">/</span><span class="k">static</span><span class="o">/</span><span class="n">css</span><span class="o">/</span> <span class="p">{</span>
+            <span class="n">concat</span> <span class="n">on</span><span class="p">;</span>
+            <span class="n">concat_max_files</span> <span class="mi">20</span><span class="p">;</span>
+         <span class="p">}</span>
+<span class="n">location</span> <span class="o">/</span><span class="k">static</span><span class="o">/</span><span class="n">js</span><span class="o">/</span> <span class="p">{</span>
+            <span class="n">concat</span> <span class="n">on</span><span class="p">;</span>
+            <span class="n">concat_max_files</span> <span class="mi">30</span><span class="p">;</span>
+         <span class="p">}</span>
+<span class="p">}}}</span>
+</pre></div>
+
+
+<h2>详细说明请查看该模块的ReadMe.md文件，这个模块在生产上虽然编译了，但在项目配置中没有启用.</h2>
+<p>{{{class="brush :bash"
+        cd /usr/local/src/
+        cd nginx-1.2.6
+        ./configure --prefix=/usr/local/nginx --with-google_perftools_module --without-http_memcached_module \
+        --user=www --group=www --with-http_stub_status_module --with-openssl=/usr/ \
+        --with-pcre=/usr/local/src/pcre-8.33 --with-http_image_filter_module --add-module=/usr/local/src/nginx-http-concat
+        make
+    }}}</p>
+<hr />
+<p>====fastdfs-nginx-module安装====
+请参看
+[[fastdfs|FastDfs4.0.6的配置与安装]]</p>
+<hr />
+<p>===Nginx配置文件详解===
+这个是Nginx篇最重要的地方，如何使用好Nginx也就完全在于这里了。所以需要首先明白一些Nginx配置文件的基本语法和相关内容。这里肯定不可能介绍全，但基本上服务器上面所使用的和Nginx配置的最基础内容是会在这里进行详细介绍的。
+{{{
+    注意:本文中所有使用的配置文件，即Nginx所有配置文件都会打包放在概览中约定的Packages/etc/nginx-conf.tar.gz
+    }}}</p>
+<hr />
+<p>====Nginx配置基本语法知识====</p>
+<h1>组成Nginx配置的基本元素。这里的元素在Nginx官方的描述里面称为Context.主要Context有:<code>events</code>、<code>http</code>、<code>server</code>、<code>location</code>.</h1>
+<h1>主要指令: <code>include</code>、<code>set</code>、<code>if</code>、<code>rewrite</code>、<code>break</code>、<code>root</code>、<code>index</code>、<code>alias</code>、<code>last</code>。这是几个核心和常用的指令。每个指令的具体用法也都很简单，具体可以参考Nginx官网或者google一下，这里就不详细叙述了。</h1>
+<h1>location的基本执行流程:</h1>
+<div class="highlight"><pre><span class="o">-</span> <span class="n">location</span><span class="err">匹配的原型是这样的：</span><span class="n">location</span> <span class="p">[</span><span class="o">=|~|~*|^~|</span><span class="err">@</span><span class="p">]</span> <span class="o">/</span><span class="n">uri</span><span class="o">/</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
+    <span class="o">-</span> <span class="err">`</span><span class="o">=</span><span class="err">`是精确匹配</span><span class="p">.</span>
+    <span class="o">-</span> <span class="err">`@`是命名的</span><span class="n">location</span><span class="err">，在正常的</span><span class="n">location</span><span class="err">匹配中不会使用，仅仅在内部跳转中才会使用到。</span>
+    <span class="o">-</span> <span class="err">`</span><span class="o">~</span><span class="err">`是区分大小写的匹配</span><span class="p">.</span>
+    <span class="o">-</span> <span class="err">`</span><span class="o">~*</span><span class="err">`是不区分大小写的匹配</span>
+    <span class="o">-</span> <span class="err">`</span><span class="o">^~</span><span class="err">`表示中止正则匹配</span>
+<span class="o">-</span> <span class="err">在一个请求中，匹配的顺序是这样的</span><span class="o">:</span>
+    <span class="o">-</span> <span class="err">带`</span><span class="o">=</span><span class="err">`前缀的先进行匹配，如果找到了，中止查找。</span>
+    <span class="o">-</span> <span class="err">所有其它</span><span class="n">location</span><span class="err">进行非正则的匹配，找到最精确匹配的那个，如果匹配到带`</span><span class="o">^~</span><span class="err">`前缀的，则中止查找。</span>
+    <span class="o">-</span> <span class="err">正则查找，按照我们配置文件中配置的</span><span class="n">location</span><span class="err">顺序进行查找。</span>
+    <span class="o">-</span> <span class="err">如果正则查找匹配成功，则使用此正则匹配的</span><span class="n">location</span><span class="err">，否则，使用第二步查找的结果。</span>
+<span class="o">-</span> <span class="err">特别说明下`</span><span class="o">=</span><span class="err">`与`</span><span class="o">^~</span><span class="err">`的区别：`</span><span class="o">=</span><span class="err">`在匹配时，则匹配带`</span><span class="o">=</span><span class="err">`的</span><span class="n">location</span><span class="err">。而`</span><span class="o">^~</span><span class="err">`，则会匹配所有非`</span><span class="o">=</span><span class="err">`的非正则</span><span class="n">location</span><span class="err">，只有在确认它是最精确匹配的</span><span class="n">location</span><span class="err">后，才生效。</span>
+</pre></div>
+
+
+<h1>Nginx内置变量:</h1>
+<div class="highlight"><pre><span class="o">-</span> <span class="err">$</span><span class="n">args</span><span class="p">,</span> <span class="err">请求中的参数</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">content_length</span><span class="p">,</span> <span class="n">HTTP</span><span class="err">请求信息里的</span><span class="s">&quot;Content-Length&quot;</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">content_type</span><span class="p">,</span> <span class="err">请求信息里的</span><span class="s">&quot;Content-Type&quot;</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">document_root</span><span class="p">,</span> <span class="err">针对当前请求的根路径设置值</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">document_uri</span>   <span class="err">与</span><span class="n">uri</span><span class="err">相同</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">host</span><span class="p">,</span> <span class="err">请求信息中的</span><span class="s">&quot;Host&quot;</span><span class="err">，如果请求中没有</span><span class="n">Host</span><span class="err">行，则等于设置的服务器名</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">limit_rate</span><span class="p">,</span> <span class="err">对连接速率的限制</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">request_method</span><span class="p">,</span> <span class="err">请求的方法，比如</span><span class="s">&quot;GET&quot;</span><span class="err">、</span><span class="s">&quot;POST&quot;</span><span class="err">等</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">remote_addr</span><span class="p">,</span> <span class="err">客户端地址</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">remote_port</span><span class="p">,</span> <span class="err">客户端端口号</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">remote_user</span><span class="p">,</span> <span class="err">客户端用户名，认证用</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">request_filename</span><span class="p">,</span> <span class="err">当前请求的文件路径名</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">request_body_file</span><span class="p">,</span> <span class="o">??</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">request_uri</span><span class="p">,</span> <span class="err">请求的</span><span class="n">URI</span><span class="err">，带参数</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">query_string</span><span class="p">,</span> <span class="n">args</span><span class="err">相同</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">scheme</span><span class="p">,</span> <span class="err">所用的协议，比如</span><span class="n">http</span><span class="err">或者是</span><span class="n">https</span><span class="err">，比如</span><span class="n">rewrite</span>  <span class="o">^</span><span class="p">(.</span><span class="o">+</span><span class="p">)</span><span class="o">-</span>   <span class="o">-</span> <span class="n">scheme</span><span class="o">:</span><span class="c1">//example.com- 1  redirect;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">server_protocol</span><span class="p">,</span> <span class="err">请求的协议版本，</span><span class="s">&quot;HTTP/1.0&quot;</span><span class="err">或</span><span class="s">&quot;HTTP/1.1&quot;</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">server_addr</span><span class="p">,</span> <span class="err">服务器地址，如果没有用</span><span class="n">listen</span><span class="err">指明服务器地址，使用这个变量将发起一次系统调用以取得地址</span><span class="p">(</span><span class="err">造成资源浪费</span><span class="p">);</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">server_name</span><span class="p">,</span> <span class="err">请求到达的服务器名</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">server_port</span><span class="p">,</span> <span class="err">请求到达的服务器端口号</span><span class="p">;</span>
+<span class="o">-</span> <span class="err">$</span><span class="n">uri</span><span class="p">,</span> <span class="err">请求的</span><span class="n">URI</span><span class="err">，可能和最初的值有不同，比如经过重定向之类的</span>
+</pre></div>
+
+
+<h1>生产服务器上Nginx基本目录结构:[[|{{../../../public/images/nginxpath.png}}]]</h1>
+<hr />
+<p>====Mdaxue-Nginx-Config详解====
+这里对Nginx配置文件核心进行着行的解释，基本流程按照上面介绍的Context顺序解析。</p>
+<h1>先来看<code>conf/nginx.conf</code>，这里是入口点。</h1>
+<p>{{{
+user  coolnet coolnet; #指定Nginx工作进程使用的用户和组，如果是做Web服务器这个用户必须权限分配好
+worker_processes  8;    #指定8个子进程
+error_log  logs/error.log;  #错误日志</p>
+<h1>error_log  logs/error.log  notice; #错误日志级别notice，下同</h1>
+<h1>error_log  logs/error.log  info;</h1>
+<h1>error_log  logs/debug.log  debug;</h1>
+<p>pid        logs/nginx.pid;  #进程pid文件，这里必须配置上面介绍Nginx平滑升级的时候有使用
+google_perftools_profiles /tmp/tcmalloc;    #google内存优化工具
+events {
+    use epoll;
+    worker_connections  65535;
+}</p>
+<h1>include rtmp.conf;  #加入了一个rtmp服务器，这个在生产上没有使用，可以注释掉</h1>
+<p>http {  #http请求开始
+    include       mime.types;   #文件类型列表
+    default_type  application/octet-stream; #默认的请求头类型
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';</p>
+<div class="highlight"><pre><span class="cp">#access_log  logs/access.log  main;</span>
+<span class="cp">#防DDOS攻击，勿删除</span>
+<span class="cp">#resolver 192.168.1.1;   #这个生产上面没有，代表Nginx使用那个DNSserver解析，这在有时候是很有用的</span>
+<span class="cp">#lua_code_cache off; #lua缓存，开启后会损失性能，但修改lua脚本会即时生效，off时需要reload Nginx，所以生产off，开发on</span>
+<span class="cp">#lua_package_path &quot;/usr/local/openresty/lualib/resty/?.lua;;&quot;;   #lua相关包路径</span>
+<span class="cp">#access_by_lua_file &quot;lua/test.lua&quot;; #引入lua脚本，这个前期服务器上面没有使用，后期可能会部署。</span>
+<span class="n">limit_conn_zone</span> <span class="err">$</span><span class="n">binary_remote_addr</span> <span class="n">zone</span><span class="o">=</span><span class="n">ddos</span><span class="o">:</span><span class="mi">10</span><span class="n">m</span><span class="p">;</span>  <span class="err">#建立一个连接限制区域，以供全局使用，这个显示是没</span><span class="mi">10</span><span class="n">M</span><span class="err">连接一次</span>
+<span class="n">limit_req_zone</span> <span class="err">$</span><span class="n">binary_remote_addr</span> <span class="n">zone</span><span class="o">=</span><span class="n">oneddos</span><span class="o">:</span><span class="mi">10</span><span class="n">m</span> <span class="n">rate</span><span class="o">=</span><span class="mi">2</span><span class="n">r</span><span class="o">/</span><span class="n">s</span><span class="p">;</span><span class="err">#</span> <span class="err">这个建立了一个请求显示区域，没秒</span><span class="mi">2</span><span class="err">个请求，以上两想是为了放</span><span class="n">DDos</span>
+<span class="n">server_names_hash_bucket_size</span> <span class="mi">128</span><span class="p">;</span>
+<span class="n">client_header_buffer_size</span> <span class="mi">32</span><span class="n">k</span><span class="p">;</span>
+<span class="n">large_client_header_buffers</span> <span class="mi">4</span> <span class="mi">32</span><span class="n">k</span><span class="p">;</span>
+<span class="n">client_max_body_size</span> <span class="mi">300</span><span class="n">m</span><span class="p">;</span>
+<span class="n">sendfile</span>        <span class="n">on</span><span class="p">;</span>
+<span class="n">tcp_nopush</span>     <span class="n">on</span><span class="p">;</span>
+<span class="n">fastcgi_connect_timeout</span> <span class="mi">300</span><span class="p">;</span>
+<span class="n">fastcgi_send_timeout</span> <span class="mi">300</span><span class="p">;</span>
+<span class="n">fastcgi_read_timeout</span> <span class="mi">300</span><span class="p">;</span>
+<span class="n">fastcgi_buffer_size</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+<span class="n">fastcgi_buffers</span> <span class="mi">4</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+<span class="n">fastcgi_busy_buffers_size</span> <span class="mi">128</span><span class="n">k</span><span class="p">;</span>
+<span class="n">fastcgi_temp_file_write_size</span> <span class="mi">128</span><span class="n">k</span><span class="p">;</span>
+<span class="n">keepalive_timeout</span>  <span class="mi">0</span><span class="p">;</span>
+<span class="cp">#keepalive_timeout  60;</span>
+<span class="n">tcp_nodelay</span> <span class="n">on</span><span class="p">;</span>
+<span class="n">server_tokens</span> <span class="n">off</span><span class="p">;</span>
+
+<span class="n">gzip</span>  <span class="n">on</span><span class="p">;</span>
+<span class="n">gzip_min_length</span>  <span class="mi">1</span><span class="n">k</span><span class="p">;</span>
+<span class="n">gzip_buffers</span>     <span class="mi">4</span> <span class="mi">16</span><span class="n">k</span><span class="p">;</span>
+<span class="n">gzip_http_version</span> <span class="mf">1.1</span><span class="p">;</span>
+<span class="n">gzip_comp_level</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">gzip_types</span>       <span class="n">text</span><span class="o">/</span><span class="n">plain</span> <span class="n">application</span><span class="o">/</span><span class="n">x</span><span class="o">-</span><span class="n">javascript</span> <span class="n">text</span><span class="o">/</span><span class="n">css</span> <span class="n">application</span><span class="o">/</span><span class="n">xml</span><span class="p">;</span>
+<span class="n">gzip_vary</span> <span class="n">on</span><span class="p">;</span>
+
+<span class="n">server</span>  <span class="err">#代表虚拟主机的开始</span>
+    <span class="p">{</span>
+ <span class="n">listen</span>       <span class="mi">80</span><span class="p">;</span>   <span class="err">#该虚拟主机监听的端口</span>
+ <span class="err">#</span><span class="n">server_name</span> <span class="n">localhost</span><span class="p">;</span>    <span class="err">#注释掉的话即为默认主机</span>
+ <span class="err">#</span><span class="n">include</span>  <span class="n">rewrite</span><span class="p">.</span><span class="n">conf</span><span class="p">;</span>
+ <span class="n">index</span> <span class="n">index</span><span class="p">.</span><span class="n">php</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span> <span class="n">index</span><span class="p">.</span><span class="n">htm</span> <span class="k">default</span><span class="p">.</span><span class="n">html</span> <span class="k">default</span><span class="p">.</span><span class="n">htm</span> <span class="k">default</span><span class="p">.</span><span class="n">php</span><span class="p">;</span> <span class="err">#</span><span class="n">index</span><span class="err">指定，默认首页</span>
+ <span class="n">root</span> <span class="n">html</span><span class="p">;</span> <span class="err">#</span><span class="n">root</span><span class="err">指令网站的绝对路径</span>
+ <span class="n">access_log</span> <span class="n">logs</span><span class="o">/</span><span class="mf">192.168.1.88</span><span class="p">.</span><span class="n">log</span><span class="p">;</span>  <span class="err">#访问日志</span>
+<span class="n">error_log</span> <span class="n">logs</span><span class="o">/</span><span class="mf">192.168.1.88</span><span class="p">.</span><span class="n">err</span><span class="p">;</span>    <span class="err">#错误日志</span>
+ <span class="n">location</span> <span class="o">~</span> <span class="p">.</span><span class="o">*</span><span class="err">\</span><span class="p">.(</span><span class="n">php</span><span class="o">|</span><span class="n">php5</span><span class="p">)</span><span class="o">?</span><span class="err">$</span>    <span class="err">#</span><span class="n">php</span><span class="err">文件的处理</span>
+                    <span class="p">{</span>
+                            <span class="n">fastcgi_pass</span>  <span class="n">unix</span><span class="o">:/</span><span class="n">tmp</span><span class="o">/</span><span class="n">php</span><span class="o">-</span><span class="n">cgi</span><span class="p">.</span><span class="n">sock</span><span class="p">;</span>   <span class="err">#以</span><span class="n">Unix</span><span class="err">套接字的方式和</span><span class="n">php</span><span class="err">进行通讯</span>
+                            <span class="err">#</span><span class="n">fastcgi_pass</span>  <span class="mf">127.0.0.1</span><span class="o">:</span><span class="mi">9000</span><span class="p">;</span>  <span class="err">#以</span><span class="n">TCP</span><span class="o">/</span><span class="n">IP</span><span class="err">的方式和</span><span class="n">php</span><span class="err">进行通讯</span>
+<span class="cp">#上面前者的性能要高于后者，但后者可以跨服务器，因为是基于网络的，前者只能只本地php,具体哪种方式取决与环境</span>
+                            <span class="n">fastcgi_index</span> <span class="n">index</span><span class="p">.</span><span class="n">php</span><span class="p">;</span>
+                            <span class="n">include</span> <span class="n">fcgi</span><span class="p">.</span><span class="n">conf</span><span class="p">;</span>  <span class="err">#</span><span class="n">fcgi</span><span class="err">配置文件</span>
+                    <span class="p">}</span>
+            <span class="n">location</span> <span class="o">/</span><span class="n">status</span> <span class="p">{</span>
+                    <span class="n">stub_status</span> <span class="n">on</span><span class="p">;</span>
+                    <span class="n">access_log</span>   <span class="n">off</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">location</span> <span class="o">~</span> <span class="p">.</span><span class="o">*</span><span class="err">\</span><span class="p">.(</span><span class="n">gif</span><span class="o">|</span><span class="n">jpg</span><span class="o">|</span><span class="n">jpeg</span><span class="o">|</span><span class="n">png</span><span class="o">|</span><span class="n">bmp</span><span class="o">|</span><span class="n">swf</span><span class="p">)</span><span class="err">$</span>
+                    <span class="p">{</span>
+                            <span class="n">expires</span>      <span class="mi">30</span><span class="n">d</span><span class="p">;</span>   <span class="err">#图片文件缓存</span><span class="mi">30</span><span class="err">天</span>
+                    <span class="p">}</span>
+            <span class="n">location</span> <span class="o">~</span> <span class="p">.</span><span class="o">*</span><span class="err">\</span><span class="p">.(</span><span class="n">js</span><span class="o">|</span><span class="n">css</span><span class="p">)</span><span class="o">?</span><span class="err">$</span>   <span class="err">#</span><span class="n">css</span><span class="o">/</span><span class="n">js</span><span class="err">静态文件缓存</span><span class="mi">12</span><span class="err">小时</span>
+                    <span class="p">{</span>
+                            <span class="n">expires</span>      <span class="mi">12</span><span class="n">h</span><span class="p">;</span>
+                    <span class="p">}</span>
+    <span class="n">location</span> <span class="o">/</span><span class="n">M00</span><span class="o">/</span> <span class="p">{</span>    <span class="err">#</span><span class="n">fastdfs</span><span class="err">配置，详细的了接请看</span><span class="p">[[</span><span class="n">fastdfs</span><span class="o">|</span><span class="n">FastDfs</span><span class="err">的安装与配置</span><span class="p">]]</span>
+        <span class="n">alias</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">fastdfs</span><span class="o">/</span><span class="n">store</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="p">;</span>
+        <span class="n">ngx_fastdfs_module</span><span class="p">;</span>
+    <span class="p">}</span>
+            <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>     <span class="err">#关闭该匹配类型下的日志记录</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>include  vhost/*.conf;  #引入虚拟主机文件
+}
+    }}}</p>
+<hr />
+<p>我这里看到了我们刚刚说到的Nginx的基本执行流程,也就是Context的执行流程，即<code>http</code>-&gt;<code>server</code>-&gt;<code>location</code>。我们最后也看到了文档最后一行<code>include</code>引入了 <code>vhost/*.conf</code>文件,这就是我们所有虚拟主机文件。虚拟主机文件的命名规则是:<code>域名</code>+<code>.conf</code>,如biz.mdaxue.com.conf,我们这里就以这个文件为例，因为大多数虚拟主机配置都几乎是一样的，有不同的在下面会分别列出来解释。
+<code>biz.mdaxue.com.conf</code>的内容为:(以后新建虚拟主机可以直接cp过去，按照下面的解释更改即可)
+{{{
+server  #虚拟主机开始
+        {
+                listen       80;
+server_name biz.mdaxue.com;     #主机域名
+access_log  logs/biz.mdaxue.com.log;    #访问日志存放路径
+error_log  logs/biz.mdaxue.com.err;     #错误日志存放路径
+index index.php index.html index.htm default.html default.htm default.php;  #默认文件列表
+include crash.filter;   #加载公共放攻击过滤器,这是一些安全配置
+root  /home/coolnet/projects/business;  #网站根目录
+location ~ .*.(php|php5)?$     #php配置支持
+{
+fastcgi_pass  unix:/tmp/php-cgi.sock;
+fastcgi_index index.php;
+include fcgi.conf;
+}
+location /status {
+stub_status on;
+access_log   off;
+}</p>
+<p>location / {    #该网站的转发规则
+rewrite ^/(\w+)/(\w+).html?(.*)$ /index.php?c=$1&amp;act=$2&amp;$3 last;
+rewrite ^/(\w+)$ /index.php?college=$1 last;
+}     <br />
+include static.conf;    #加载静态文件处理配置
+}
+}}}</p>
+<hr />
+<p>好，到此我们看到了一个完全的虚拟主机是怎么建立的，而且通过上面我们可以知道，这是一个模板，而且我们约定所有大学网都基本上是这样一个模式建立的虚拟主机，所以我们看这个配置文件，都加载了两个全局配置文件<code>crash.filter</code>、<code>static.conf</code>，这两个是全局的，所以如果以后有什么规则需要全站都使用的可以放到这里面来。接下来我们就来看看这两个文件:</p>
+<h1><code>crash.filter</code>:</h1>
+<div class="highlight"><pre><span class="p">{{{</span>
+</pre></div>
+
+
+<h1>在搜索引擎中打开分站都也和www.mdaxue.com</h1>
+<h1>if ($request_uri ~<em> .</em>/$){</h1>
+<p># return 405; 
+ # set $on index;</p>
+<h1>}</h1>
+<h1>防各种蜘蛛</h1>
+<h1>if ($http_user_agent ~* "360Spider|JikeSpider|Spider|spider|bot|Bot|2345Explorer|curl|wget|webZIP|qihoobot|Baiduspider|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot|NSPlayer|bingbot")</h1>
+<p>#        {</p>
+<h1>set $on "${on}spider";</h1>
+<h1>return 403;</h1>
+<p>#         }</p>
+<h1>if ($on != "indexspider"){</h1>
+<h1>return 405;</h1>
+<h1>}</h1>
+<h1>防空头攻击</h1>
+<p>if ($http_user_agent ~ ^$){
+    return 503;
+}</p>
+<h1>听力死链接</h1>
+<p>location ~<em> ^(.</em>)(studyhard/listen/html/English)(.*)$ {
+    return 404;
+}</p>
+<h1>防盗链</h1>
+<h1>location ~ .*.(jpeg|wma|wmv|asf|mp3|mmf|zip|rar|jpg|gif|png|swf|flv)$ {</h1>
+<p>#   valid_referers none blocked www.mdaxue.com *.mdaxue.com;
+  #   if ($invalid_referer) {
+   #  return 403;
+    #  }</p>
+<h1>}</h1>
+<h1>limit_conn ddos 10;</h1>
+<h1>limit_req zone=oneddos burst=50;</h1>
+<h1>我们看到这里都注释掉了，是因为前期推广的原因，不需要屏蔽蜘蛛。这里的各项都可以按需求开启，以后有关安全限制的都可以放到这里来加载，那么全站就都可以生效了.</h1>
+<div class="highlight"><pre>    <span class="p">}}}</span>
+</pre></div>
+
+
+<h1><code>static.conf</code>:</h1>
+<p>{{{</p>
+<h1>server static files direct</h1>
+<div class="highlight"><pre><span class="n">location</span> <span class="o">~*</span> <span class="o">/</span><span class="n">group1</span><span class="o">/</span><span class="n">M00</span><span class="o">/</span><span class="p">.</span><span class="o">*-</span><span class="p">(</span><span class="err">\</span><span class="n">d</span><span class="o">+</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="err">\</span><span class="n">d</span><span class="o">+</span><span class="p">)</span><span class="err">\</span><span class="p">.(</span><span class="n">gif</span><span class="o">|</span><span class="n">jpe</span><span class="o">?</span><span class="n">g</span><span class="o">|</span><span class="n">png</span><span class="o">|</span><span class="n">bmp</span><span class="o">|</span><span class="n">swf</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>      <span class="err">#这里是</span><span class="n">image_filter</span><span class="err">结合</span><span class="n">FastDfs</span><span class="err">作的图片缩放</span>
+    <span class="err">#</span><span class="n">alias</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">fastdfs</span><span class="o">/</span><span class="n">store</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="p">;</span>   <span class="err">#</span><span class="n">alias</span><span class="err">指令指定该</span><span class="n">Context</span><span class="err">的文件配置路径</span>
+          <span class="err">#</span><span class="n">ngx_fastdfs_module</span><span class="p">;</span>  <span class="err">#在此启用</span><span class="n">FastDfs</span><span class="err">模块组件</span>
+      <span class="n">set</span> <span class="err">$</span><span class="n">img_width</span> <span class="err">$</span><span class="mi">1</span><span class="p">;</span>    <span class="err">#将</span><span class="n">location</span><span class="err">里面的正则$</span><span class="mi">1</span><span class="err">赋值给</span><span class="n">img_width</span><span class="err">变量</span>
+      <span class="n">set</span> <span class="err">$</span><span class="n">img_height</span> <span class="err">$</span><span class="mi">2</span><span class="p">;</span>   <span class="err">#将</span><span class="n">location</span><span class="err">里面的正则$</span><span class="mi">2</span><span class="err">赋值给</span><span class="n">img_height</span><span class="err">变量</span>
+      <span class="n">rewrite</span> <span class="o">^/</span><span class="p">(.</span><span class="o">*</span><span class="p">)</span><span class="o">-</span><span class="err">\</span><span class="n">d</span><span class="o">+-</span><span class="err">\</span><span class="n">d</span><span class="o">+</span><span class="err">\</span><span class="p">.(</span><span class="n">png</span><span class="o">|</span><span class="n">jpe</span><span class="o">?</span><span class="n">g</span><span class="o">|</span><span class="n">gif</span><span class="o">|</span><span class="n">ico</span><span class="p">)</span><span class="err">$</span> <span class="o">/</span><span class="err">$</span><span class="mf">1.</span><span class="err">$</span><span class="mi">2</span> <span class="k">break</span><span class="p">;</span>    <span class="err">#将满足前面正则的</span><span class="n">url</span><span class="err">转发到实际可访问的路径</span>
+      <span class="n">image_filter</span> <span class="n">resize</span> <span class="err">$</span><span class="n">img_width</span> <span class="err">$</span><span class="n">img_height</span><span class="p">;</span>   <span class="err">#</span><span class="n">image_filter</span> <span class="err">按指定宽高缩放图片</span>
+      <span class="n">image_filter_buffer</span> <span class="mi">2</span><span class="n">M</span><span class="p">;</span>   <span class="err">#缩放图片时使用的</span><span class="n">buffer</span><span class="err">大小</span>
+          <span class="n">expires</span> <span class="mi">1</span><span class="n">y</span><span class="p">;</span>
+          <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+          <span class="n">gzip</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">location</span> <span class="o">~*</span> <span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">-</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="err">\</span><span class="p">.(</span><span class="n">png</span><span class="o">|</span><span class="n">jpe</span><span class="o">?</span><span class="n">g</span><span class="o">|</span><span class="n">gif</span><span class="o">|</span><span class="n">ico</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>   <span class="err">#这个也一样只是规则不一样</span>
+    <span class="n">set</span> <span class="err">$</span><span class="n">img_width</span> <span class="err">$</span><span class="mi">1</span><span class="p">;</span>
+      <span class="n">set</span> <span class="err">$</span><span class="n">img_height</span> <span class="err">$</span><span class="mi">2</span><span class="p">;</span>
+      <span class="n">rewrite</span> <span class="o">^</span><span class="p">(.</span><span class="o">*</span><span class="p">)</span><span class="o">-</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+-</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="err">\</span><span class="p">.(</span><span class="n">png</span><span class="o">|</span><span class="n">jpe</span><span class="o">?</span><span class="n">g</span><span class="o">|</span><span class="n">gif</span><span class="o">|</span><span class="n">ico</span><span class="p">)</span><span class="err">$</span> <span class="o">/</span><span class="err">$</span><span class="mf">1.</span><span class="err">$</span><span class="mi">2</span> <span class="k">break</span><span class="p">;</span>
+      <span class="n">image_filter</span> <span class="n">resize</span> <span class="err">$</span><span class="n">img_width</span> <span class="err">$</span><span class="n">img_height</span><span class="p">;</span>
+      <span class="n">image_filter_buffer</span> <span class="mi">2</span><span class="n">M</span><span class="p">;</span>
+          <span class="n">expires</span> <span class="mi">1</span><span class="n">y</span><span class="p">;</span>
+          <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+          <span class="n">gzip</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="n">location</span> <span class="o">~*</span> <span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="n">x</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)(</span><span class="err">\</span><span class="p">.</span><span class="n">JPG</span><span class="o">|</span><span class="n">jpg</span><span class="o">|</span><span class="n">GIF</span><span class="o">|</span><span class="n">gif</span><span class="o">|</span><span class="n">png</span><span class="o">|</span><span class="n">PNG</span><span class="o">|</span><span class="n">ico</span><span class="o">|</span><span class="n">ICO</span><span class="o">|</span><span class="n">bmp</span><span class="o">|</span><span class="n">BMP</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span> <span class="err">#这个是用</span><span class="n">lua</span><span class="err">做的图片缩放，能满足所有功能并且支持缓存，性能更好</span><span class="p">,</span>
+<span class="err">但暂时还没有部署到生产上面去</span>
+
+    <span class="n">set</span> <span class="err">$</span><span class="n">img_width</span> <span class="err">$</span><span class="mi">1</span><span class="p">;</span>
+            <span class="n">set</span> <span class="err">$</span><span class="n">img_height</span> <span class="err">$</span><span class="mi">2</span><span class="p">;</span>
+    <span class="n">set</span> <span class="err">$</span><span class="n">ext</span> <span class="err">$</span><span class="mi">3</span><span class="p">;</span>
+    <span class="n">access_by_lua_file</span> <span class="err">&#39;</span><span class="n">lua</span><span class="o">/</span><span class="n">thumb</span><span class="p">.</span><span class="n">lua</span><span class="err">&#39;</span><span class="p">;</span>
+    <span class="n">expires</span> <span class="mi">1</span><span class="n">y</span><span class="p">;</span>
+            <span class="n">gzip</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="n">location</span> <span class="o">~*</span> <span class="o">/</span><span class="n">group1</span><span class="o">/</span><span class="n">M00</span><span class="o">/</span> <span class="p">{</span>  <span class="err">#全站启用</span><span class="n">fastDfs</span><span class="err">，这块很重要，必须开启</span>
+    <span class="n">alias</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">fastdfs</span><span class="o">/</span><span class="n">store</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="p">;</span>
+    <span class="n">ngx_fastdfs_module</span><span class="p">;</span>
+<span class="p">}</span>
+    <span class="n">location</span> <span class="o">~*</span> <span class="err">\</span><span class="p">.(</span><span class="n">mp3</span><span class="o">|</span><span class="n">doc</span><span class="o">|</span><span class="n">rar</span><span class="o">|</span><span class="n">zip</span><span class="o">|</span><span class="n">wmv</span><span class="o">|</span><span class="n">flv</span><span class="o">|</span><span class="n">avi</span><span class="o">|</span><span class="n">mpeg</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>     <span class="err">#对以上这些定义的文件启用缓存，关闭日志，时间为</span><span class="mi">1</span><span class="err">年</span>
+            <span class="n">expires</span> <span class="mi">1</span><span class="n">y</span><span class="p">;</span>
+            <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+            <span class="n">gzip</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="n">location</span> <span class="o">~*</span> <span class="err">\</span><span class="p">.(</span><span class="n">png</span><span class="o">|</span><span class="n">jpe</span><span class="o">?</span><span class="n">g</span><span class="o">|</span><span class="n">gif</span><span class="o">|</span><span class="n">ico</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>    <span class="err">#对全站图片启用缓存，关闭日志，时间为</span><span class="mi">1</span><span class="err">天</span>
+            <span class="n">expires</span> <span class="mi">1</span><span class="n">d</span><span class="p">;</span> 
+            <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>   
+    <span class="n">location</span> <span class="o">~*</span> <span class="err">\</span><span class="p">.(</span><span class="n">css</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>      <span class="err">#对全站</span><span class="n">css</span><span class="err">文件启用缓存，关闭日志，时间为</span><span class="mi">1</span><span class="err">天</span>
+            <span class="n">expires</span> <span class="mi">1</span><span class="n">d</span><span class="p">;</span>
+            <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">location</span> <span class="o">~*</span> <span class="err">\</span><span class="p">.(</span><span class="n">js</span><span class="p">)</span><span class="err">$</span> <span class="p">{</span>   <span class="err">#对全站</span><span class="n">Js</span><span class="err">文件启用混存，关闭日志，时间为</span><span class="mi">1</span><span class="err">小时</span>
+            <span class="n">expires</span> <span class="mi">1</span><span class="n">h</span><span class="p">;</span>
+            <span class="n">access_log</span> <span class="n">off</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}}}</span>
+</pre></div>
+
+
+<hr />
+<p>最后我们来说明下最复杂的一个配置文件:<code>www.mdaxue.com.conf</code>
+{{{
+    upstream www.mdaxue.com{    #这里定义了一个反向代理,名称为www.mdaxue.com
+        server 127.0.0.1:8080;  #该反向代理转发的服务器
+        ip_hash;    #负载均衡时有用，代表一个Ip对应一台服务器，这个代表轮循规则，使用这种方式可以实现Session共享，其它的几种方式可以查看相关文档
+    }
+    upstream home.mdaxue.com{
+        server 127.0.0.1;
+    }
+    server {
+        listen 80;
+        server_name www.mdaxue.com mdaxue.com;  #监听www.mdaxue.com和<em>.mdaxue.com虚拟主机
+        if ( $host != "www.mdaxue.com" ) {      #如果主机不为www.mdaxue.com
+            rewrite ^/(.</em>)$ http://www.mdaxue.com/$1 permanent;就交有上面定义的www.mdaxue.com反向代理处理，即Java部分
+        }
+        #上面这个if代表的是所有以www.mdaxue.com为域名并且url后面海有东西的交由Tomcat来处理，即上面定义的127.0.0.1:8080
+        access_log  logs/www.mdaxue.com.log;
+        root /home/coolnet/java/tomcat6/webapps/ROOT;
+        include static.conf;
+        location ~* ^/$ {   #这个代表网址刚好是www.mdaxue.com即总站首页，交由php来处理，即home.mdaxue.com这个虚拟主机对应的项目
+            proxy_pass http://home.mdaxue.com;
+            proxy_set_header Host home.mdaxue.com;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            client_max_body_size 10m;
+            client_body_buffer_size 128k;
+            proxy_connect_timeout 90;
+            proxy_send_timeout 90;</p>
+<div class="highlight"><pre>        <span class="n">proxy_buffer_size</span> <span class="mi">4</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_buffers</span> <span class="mi">4</span> <span class="mi">32</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_busy_buffers_size</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_temp_file_write_size</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+
+    <span class="p">}</span>
+    <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>    <span class="err">#这个默认所有分站走这里面</span>
+        <span class="n">rewrite</span> <span class="o">/</span><span class="err">$</span> <span class="o">/</span><span class="k">default</span><span class="p">.</span><span class="k">do</span><span class="p">;</span>
+        <span class="n">include</span> <span class="n">www</span><span class="p">.</span><span class="n">mdaxue</span><span class="p">.</span><span class="n">com</span><span class="p">.</span><span class="n">rewrite</span><span class="p">.</span><span class="n">conf</span><span class="p">;</span>    <span class="err">#加载</span><span class="n">www</span><span class="p">.</span><span class="n">mdaxue</span><span class="p">.</span><span class="n">com</span><span class="err">转发规则，该规则不在</span><span class="n">Nginx</span><span class="err">里面说明，详细说明请看</span><span class="n">Mdaxue</span><span class="err">项目手册</span>
+        <span class="n">include</span> <span class="n">crash</span><span class="p">.</span><span class="n">filter</span><span class="p">;</span>       
+        <span class="n">proxy_pass</span> <span class="n">http</span><span class="o">:</span><span class="c1">//www.mdaxue.com;</span>
+        <span class="n">proxy_set_header</span> <span class="n">Host</span> <span class="err">$</span><span class="n">host</span><span class="p">;</span>
+        <span class="n">proxy_redirect</span> <span class="n">off</span><span class="p">;</span>
+        <span class="n">proxy_set_header</span> <span class="n">X</span><span class="o">-</span><span class="n">Real</span><span class="o">-</span><span class="n">IP</span> <span class="err">$</span><span class="n">remote_addr</span><span class="p">;</span>
+        <span class="n">proxy_set_header</span> <span class="n">X</span><span class="o">-</span><span class="n">Forwarded</span><span class="o">-</span><span class="n">For</span> <span class="err">$</span><span class="n">proxy_add_x_forwarded_for</span><span class="p">;</span>
+        <span class="n">client_max_body_size</span> <span class="mi">10</span><span class="n">m</span><span class="p">;</span>
+        <span class="n">client_body_buffer_size</span> <span class="mi">128</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_connect_timeout</span> <span class="mi">90</span><span class="p">;</span>
+        <span class="n">proxy_send_timeout</span> <span class="mi">90</span><span class="p">;</span>
+
+        <span class="n">proxy_buffer_size</span> <span class="mi">4</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_buffers</span> <span class="mi">4</span> <span class="mi">32</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_busy_buffers_size</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+        <span class="n">proxy_temp_file_write_size</span> <span class="mi">64</span><span class="n">k</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+<span class="p">}}}</span>
+</pre></div>
+
+
+<hr />
+<h2>至此Nginx即完全说明完了，如有不足的可以后期修改和增加.</h2></div>
+         <div class="footer">
+            <ul class="tags">                <li>
+                    <a href="http://www.blog.me/tag/wiki.html">Wiki</a>
+                </li>            </ul>
+        </div>
+        <hr>
+       
+        <h2>Comments</h2> <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'coolnet'; 
+    var disqus_title = 'Nginx1.2.6的安装与配置';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://www.blog.me/archives.html">Archives</a>
+                <li><a href="http://www.blog.me/tags.html">Tags</a>
+                <li><a href="http://www.blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://www.blog.me/category/fu-zai-jun-heng.html">负载均衡</a></li>
+                <li><a href="http://www.blog.me/category/git.html">git</a></li>
+                <li><a href="http://www.blog.me/category/jian-kong.html">监控</a></li>
+                <li><a href="http://www.blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://www.blog.me/category/mysql.html">MySQL</a></li>
+                <li><a href="http://www.blog.me/category/pyqt.html">PyQt</a></li>
+                <li><a href="http://www.blog.me/category/python.html">Python</a></li>
+                <li><a href="http://www.blog.me/category/shell.html">shell</a></li>
+                <li><a href="http://www.blog.me/category/vim.html">Vim</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://www.blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
