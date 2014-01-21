@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>coolnet's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对PHP比较熟悉,也喜欢用PHP捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/PHP/Vim.">
+    <meta name="keywords" content="PHP, Linux, vim, 开源">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="http://blog.me/lisp-wen-jian-he-wen-jian-io.html"><h1>Lisp 文件和文件I/O</h1></a>
+四 28 三月 2013
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ 
+        </div>
+        
+        <div><h2>读取文件数据</h2>
+<p><em>OPEN</em>函数获取一个流并从中读取文件的内容.</p>
+<p><em>READ-CHAR</em>读取单个字符, <em>READ-LINE</em>读取一行文本, 去掉行结束字符作为一个字符串返回, <em>READ</em>读取单一个S-表达式并返回一个Lisp对象.</p>
+<p><em>CLOSE</em>函数用来关闭文件流</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">in</span> <span class="p">(</span><span class="n">open</span> <span class="s">&quot;/some/file/name.txt&quot;</span><span class="p">)))</span>
+  <span class="p">(</span><span class="n">format</span> <span class="n">t</span> <span class="s">&quot;~a~%&quot;</span> <span class="p">(</span><span class="n">read</span><span class="o">-</span><span class="n">line</span> <span class="n">in</span><span class="p">))</span>
+  <span class="p">(</span><span class="n">close</span> <span class="n">in</span><span class="p">))</span>
+</pre></div>
+
+
+<p>可以给<em>OPEN</em>指定关键字参数 <em>:if-does-not-exist_来指定打开文件不存在事的行为: </em>:error_, 报错(默认), <em>:create</em>, 继续进行并创建该文件, <em>NIL</em>, 让它返回<em>NIL</em>代替一个流</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">in</span> <span class="p">(</span><span class="n">open</span> <span class="s">&quot;/some/file/name.txt&quot;</span> <span class="o">:</span><span class="k">if</span><span class="o">-</span><span class="n">dos</span><span class="o">-</span><span class="n">not</span><span class="o">-</span><span class="n">exist</span> <span class="n">nil</span><span class="p">)))</span>
+  <span class="p">(</span><span class="n">when</span> <span class="n">in</span>
+    <span class="p">(</span><span class="n">format</span> <span class="n">t</span> <span class="s">&quot;~a~%&quot;</span> <span class="p">(</span><span class="n">read</span><span class="o">-</span><span class="n">line</span> <span class="n">in</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">close</span> <span class="n">in</span><span class="p">)))</span>
+</pre></div>
+
+
+<p><em>READ-CHAR</em>, <em>READ-LINE</em>和<em>READ</em>都接受一个可选参数, 其默认值为真并指定当函数在文件末尾出被调用是是否应该报错.如果参数为<em>NIL</em>, 它们在遇到文件结尾时将返回它们的第三个参数的值, 默认为<em>NIL</em>, 因此可以像下面这样打印一个文件的所有行:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">in</span> <span class="p">(</span><span class="n">open</span> <span class="s">&quot;/some/file/name.txt&quot;</span> <span class="o">:</span><span class="k">if</span><span class="o">-</span><span class="n">does</span><span class="o">-</span><span class="n">not</span><span class="o">-</span><span class="n">exist</span> <span class="n">nil</span><span class="p">)))</span>
+  <span class="p">(</span><span class="n">when</span> <span class="n">in</span>
+    <span class="p">(</span><span class="n">loop</span> <span class="k">for</span> <span class="n">line</span> <span class="o">=</span> <span class="p">(</span><span class="n">read</span><span class="o">-</span><span class="n">line</span> <span class="n">in</span> <span class="n">nil</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="k">do</span> <span class="p">(</span><span class="n">format</span> <span class="n">t</span> <span class="s">&quot;~a~%&quot;</span> <span class="n">line</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">close</span> <span class="n">in</span><span class="p">)))</span>
+</pre></div>
+
+
+<p><em>READ</em>是Lisp独有的.每次调用时, 它会读取单一的S-表达式, 跳过空格和注释, 然后返回有S-表达式代表的Lisp对象.</p>
+<p><em>PRINT</em>可以以"可读的"形式打印Lisp对象.所以当需要保存一点数据时, <em>PRINT</em>和<em>READ</em>提供了一个简单的途径, 无须涉及一套数据格式或编写一个解析其, S-表达式也是用于诸如配置文件等事务的良好格式.(但小心<em>READ</em>读取后<em>PRINT</em>丢失注释)</p>
+<h2>读取字符流</h2>
+<p><em>OPEN</em>默认返回字符流, 可以向<em>OPEN</em>传递一个值为 '(unsigned-byte *)的 _:element-typ_参数就可以读取原始字节</p>
+<p>使用<em>READ-BYTE</em>来读取上面<em>OPEN</em>函数返回的流, 它同样支持可选参数以便指定读取文件末尾时是否应该报错</p>
+<h2>批量读取</h2>
+<p>最后一个读取函数<em>READ-SEQUENCE</em>可以同时工作在字符和二进制流上.同时可以传递一个序列(通常是一个向量)和一个流, 它会尝试用来自流的数据填充该序列.它返回序列中的第一个没有被填充元素的索引, 或者在完全填充的情况下返回改序列的茶馆难度, 也可以传递 <em>:start_和 </em>:end_关键字参数来指定一个应当被替代填充的子序列.改序列参数的元素类型必须足以保存带有改流元素类型的元素.</p>
+<h2>文件输出</h2>
+<p><em>OPEN</em>函数指定 给 <em>:direction_关键字参数传递 </em>:output_参数可以获取一个输出流</p>
+<p><em>:if-exists_关键字参数可以在文件存在时不报错, 传递 </em>:supersede_可以告诉<em>OPEN</em>来替换已有文件, 传递 <em>:append_将导致<em>OPEN</em>打开已有的文件新数据将被追加到文件末尾, </em>:overwrite_返回一个从文件爱能开始出开始的流从而覆盖已有的数据.传递<em>NIL</em>将倒是<em>OPEN</em>在文件已存在时返回<em>NIL</em>而不是流</p>
+<p>一个典型的<em>OPEN</em>输出流:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">open</span> <span class="s">&quot;/some/file/name.txt&quot;</span> <span class="o">:</span><span class="n">direction</span> <span class="o">:</span><span class="n">output</span> <span class="o">:</span><span class="k">if</span><span class="o">-</span><span class="n">exists</span> <span class="o">:</span><span class="n">supersede</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>写数据函数</h3>
+<p><em>WRITE-CHAR</em> 会向流中写入一个单一字符</p>
+<p><em>WRITE-LINE</em> 写一个字符串并紧跟一个换行</p>
+<p><em>WRITE-STRING</em> 写一个字符串而不会添加任何字符</p>
+<p><em>TERPRI</em> 无条件打印一个换行符</p>
+<p><em>FRESH-LINE</em> 打印一个换行符, 除非改流已经在一行的开始处</p>
+<p><em>PRINT</em> 打印一个S-表达式, 前缀一个换行以及一个空格</p>
+<p><em>PRIN1</em> 只打印S-表达式</p>
+<p><em>PPRINT</em> 美观的打印S-表达式</p>
+<p>并非所有的对象都能以一种<em>READ</em>可理解的形式打印出来.当试图使用<em>PRINT</em> <em>PRIN1</em>或<em>PPRINT</em>来打印这样一种对象时, 变量<em>PRINT-READABLY</em>将会予以控制.当它是<em>NIL</em>时, 这些函数将以一种导致<em>READ</em>在试图读取时肯定会报错的特殊语法来打印对象;否则它们直接报错而不直接打印该对象</p>
+<p><em>PRINC</em>是一种很适合人们使用的方式来答应Lisp对象</p>
+<p><em>OPEN</em>打开文件时传递值为 '(unsigned-byte 8)的 _:element-type_实参可以获取一个二进制输出流, 使用<em>WRITE-BYTE</em>向流中写入单独的字节</p>
+<p>批量输出函数<em>WRITE-SEQUENCE</em>可同时接受二进制和字符流, 只要序列中所有元素都是用与改流的适当类型即可</p>
+<h2>关闭文件</h2>
+<p><em>WITH-OPEN-FILE</em>宏可以确保文件使用完毕后总是被关闭, 其是建立在<em>UNWIND-PROTECT</em>之上</p>
+<p>所以推荐打开文件%99都用这个宏</p>
+<h2>可移植的文件名 ---- 路径名</h2>
+<p>为了可移植Common Lisp提供了一种文件名的表示方式:路径名对象.路径名以一种解构话的方式来表示文件名</p>
+<p>路径名是一种使用6个组来表示文件名的结构化对象:主机、设备、目录、名称、类型以及版本.这些组件多数都接受原子值, 通常是字符串.只有目录组件有其进一步的机构, 含有一个目录名列表, 其中带有关键字 <em>:absolute</em> 或 <em>:relative_作为前.只有目录组件有其进一步的机构, 含有一个目录名列表, 其中带有关键字 </em>:absolute_ 或 _:relative_作为前缀.</p>
+<p>可以使用<em>PATHNAME</em>函数将字符串转化成路径名</p>
+<p>Unix文件系统上, 只有目录、名称和了性组件通常会被用到。在Windows上， 还有一个组件（通常是设备或主机）用来保存驱动器字母</p>
+<p>可以使用<em>PATHNAME-DIRECTORY</em>、PATHNAME-NAME<em>和</em>PATHNAME-TYPE*来检查一个路径名的单独组件</p>
+<div class="highlight"><pre><span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">pathname</span><span class="o">-</span><span class="n">directory</span> <span class="p">(</span><span class="n">pathname</span> <span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">))</span>
+<span class="p">(</span><span class="o">:</span><span class="n">ABSOLUTE</span> <span class="s">&quot;foo&quot;</span> <span class="s">&quot;bar&quot;</span><span class="p">)</span>
+<span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">pathname</span><span class="o">-</span><span class="n">name</span> <span class="p">(</span><span class="n">pathname</span> <span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">))</span>
+<span class="s">&quot;baz&quot;</span>
+<span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">pathname</span><span class="o">-</span><span class="n">type</span> <span class="p">(</span><span class="n">pathname</span> <span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">))</span>
+<span class="s">&quot;txt&quot;</span> 
+</pre></div>
+
+
+<p><em>PATHNAME-HOST</em> <em>PATHNAME-DEVIECE</em>和<em>PATHNAME-VERSION</em>允许你访问其他三个路径组件名</p>
+<h1>p后接一个双引号的字符串是路径名的字面量</h1>
+<p><em>NAMESTRING</em>接受一个路径名描述符并返回一个名字字符串</p>
+<p><em>DIRECTORY-NAMESTRING</em> 和 <em>FILE-NAMESTRING</em>返回一个部分名字字符串</p>
+<div class="highlight"><pre><span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">namestring</span> <span class="err">#</span><span class="n">p</span><span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">)</span>
+<span class="s">&quot;/foo/bar/baz.txt&quot;</span>
+<span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">directory</span><span class="o">-</span><span class="n">namestring</span> <span class="err">#</span><span class="n">p</span><span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">)</span>
+<span class="s">&quot;/foo/bar/&quot;</span>
+<span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">file</span><span class="o">-</span><span class="n">namestring</span> <span class="err">#</span><span class="n">p</span><span class="s">&quot;/foo/bar/baz.txt&quot;</span><span class="p">)</span>
+<span class="s">&quot;baz.txt&quot;</span>
+</pre></div>
+
+
+<h2>构造新路径名</h2>
+<p><em>MAKE-PATHNAME</em>函数来构造任意路径名.每个路径名组件都接受一个关键字参数并返回一个路径名.没被传递的将为<em>NIL</em></p>
+<div class="highlight"><pre><span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">make</span><span class="o">-</span><span class="n">pathname</span>
+          <span class="o">:</span><span class="n">directory</span> <span class="err">&#39;</span><span class="p">(</span><span class="o">:</span><span class="n">absolute</span> <span class="s">&quot;foo&quot;</span> <span class="s">&quot;bar&quot;</span><span class="p">)</span>
+          <span class="o">:</span><span class="n">name</span> <span class="s">&quot;baz&quot;</span>
+          <span class="o">:</span><span class="n">type</span> <span class="s">&quot;txt&quot;</span><span class="p">)</span>
+<span class="cp">#P&quot;/foo/bar/baz.txt&quot; </span>
+</pre></div>
+
+
+<p><em>MERGE-PATHNAMES</em>接受两个路径名并合并它们, 用跌入个路径名对应的值填充第一个路径名中任何<em>NIL</em>组件</p>
+<h2>与文件系统交互</h2>
+<p><em>PROBE-FILE</em>用于测试某个路径名描述符的文件是否存在, 如果存在将返回该文件的真实名称</p>
+<p><em>DELETE-FILE</em>和<em>RENAME-FILE</em>用来删除和重命名, <em>DELETE-FILE</em>接受一个路径名描述符并删除所命名的文件, 当成功是返回真, 否则它产生另一个<em>FILE-ERROR</em>报错</p>
+<p><em>RENAME-FILE</em>接受两个路径名描述符, 并进行重命名</p>
+<p><em>ENSURE-DIRECTORIES-EXIST</em>来创建目录.它接受一个路径名描述符并确保目录组件中的所有元素存在并且是目录, 如果必要的话它会创建它们. 如果传递的不是目录形式, 则最后一级子目录不会被创建</p>
+<p><em>FILE-WRITE-DATE</em>和<em>FILE-AUTHOR</em>都接受一个路径名描述符.</p>
+<p><em>FILE-WRITE-DATE</em>返回文件上次被写入的事件, 表示形式是从GMT 1990-1-1 00:00起的秒数</p>
+<p><em>FILE-AUTHOR</em> 返回文件拥有者</p>
+<p><em>FILE-LENGTH</em>由于历史原因接受一个流而不是路径名</p>
+<p><em>FILE-POSITION</em> 同样接受一个流, 并返回文件中的当前位置</p>
+<h2>其他文件 I/O类型</h2>
+<p><em>STRING-STREAM</em>从一个字符串中读取或写入数据</p>
+<p><em>MAKE-STRING-INPUT-STREAM</em>和 <em>MAKE-STRING-OUT-STREAM</em>用来创建 <em>STRING-STREAM</em>, 它们返回一个字符串流可以被 <em>READ-CHAR</em> <em>READ-LINE</em>或<em>READ</em>或<em>FORMAT</em> <em>PRINT</em> <em>WRITE-CHAR</em>以及<em>WRITE-LINE</em>这种函数操作</p>
+<p>被写入的字符串流可以使用 <em>GET-OUTPUT-STREAM-STRING</em>来获取改字符串, 并清空该流</p>
+<p>宏<em>WITH-INPUT-FROM-STRING</em>和<em>WITH-OUTPUT-TO-STRING</em>提供了以个更加遍历的接口</p>
+<p><em>BROADCAST-STREAM</em>是一个输出流, <em>MAKE-BROADCAST-STREAM</em>用来构造它, <em>CONCATENATED-STREAM</em>是一个输入流, <em>MAKE-CONCATENATED-STREAM</em>用来构造它, 其接受任何数量的流作为参数</p>
+<p>两种可以将流以多种方式拼接在一起的双向流是 <em>TWO-WAY-STREAM</em>和<em>ECHO-STREAM</em>, 使用<em>MAKE-TWO-WAY-STREAM</em>和<em>MAKE-ECHO-STREAM</em>用来构造它们, 它们都接受两个参数, 一个输入流一个输出流, 并返回一个适当类型的可同时用于输入和输出的流</p>
+<p>不同的是 <em>ECHO-STREAM</em>这中的输出流将含有会话的双发的一个副本</p></div>
+        <hr />
+    </div>
+		
+<div class="pagination">
+<ul>
+    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="active"><a href="http://blog.me/tag/wen-jian.html">1</a></li>
+
+    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://blog.me/archives.html">Archives</a>
+                <li><a href="http://blog.me/tags.html">Tags</a>
+                <li><a href="http://blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://blog.me/category/bar.html">bar</a></li>
+                <li><a href="http://blog.me/category/cat1.html">cat1</a></li>
+                <li><a href="http://blog.me/category/content.html">content</a></li>
+                <li><a href="http://blog.me/category/han-shu.html">函数</a></li>
+                <li><a href="http://blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://blog.me/category/lisp.html">Lisp</a></li>
+                <li><a href="http://blog.me/category/test_data.html">test_data</a></li>
+                <li><a href="http://blog.me/category/yeah.html">yeah</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>coolnet's world</title><link href="http://blog.me/" rel="alternate"></link><link href="http://blog.me/feeds/test_data.atom.xml" rel="self"></link><id>http://blog.me/</id><updated>3000-07-09T00:00:00+08:00</updated><entry><title>Testing</title><link href="http://blog.me/plugin-test.html" rel="alternate"></link><updated>3000-07-09T00:00:00+08:00</updated><author><name>coolnet</name></author><id>tag:blog.me,3000-07-09:plugin-test.html</id><summary type="html">&lt;p&gt;Testeando un poco la cosa&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.example.com"&gt;Normal boring link&lt;/a&gt;. But this is a &lt;a href="this&amp;gt;"&gt;cool link&lt;/a&gt; that links to this site.&lt;/p&gt;
+&lt;p&gt;Search in &lt;a href="wikipedia_en&amp;gt;python"&gt;Wikipedia&lt;/a&gt;, (&lt;a href="wikipedia_es&amp;gt;python"&gt;here&lt;/a&gt; in spanish). Also can &lt;a href="ddg&amp;gt;python"&gt;search&lt;/a&gt; it.&lt;/p&gt;</summary></entry><entry><title>Images Test</title><link href="http://blog.me/images-test.html" rel="alternate"></link><updated>2013-04-23T15:59:39+08:00</updated><author><name>coolnet</name></author><id>tag:blog.me,2013-04-23:images-test.html</id><summary type="html">&lt;div class="figure"&gt;
+&lt;img alt="" src="/static/images/dummy-800x300.png" /&gt;
+&lt;p class="caption"&gt;This is the caption of the figure (a simple paragraph).&lt;/p&gt;
+&lt;div class="legend"&gt;
+The legend consists of all elements after the caption.  In this
+case, the legend consists of this paragraph.&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="map to buried treasure" src="/static/images/dummy-200x200.png" /&gt;
+&lt;p class="caption"&gt;This is the caption of the figure (a simple paragraph).&lt;/p&gt;
+&lt;div class="legend"&gt;
+The legend consists of all elements after the caption.  In this
+case, the legend consists of this paragraph.&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;div class="figure align-right"&gt;
+&lt;img alt="map to buried treasure 2" src="/static/images/dummy-250x300.png" /&gt;
+&lt;p class="caption"&gt;This is the second image caption.&lt;/p&gt;
+&lt;div class="legend"&gt;
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua.&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;img alt="" src="/static/images/dummy-200x200.png" /&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;img alt="" class="align-right" src="/static/images/dummy-250x300.png" /&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+</summary><category term="images"></category><category term="test"></category></entry></feed>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>coolnet's world</title>
+    <meta name="description" content="博主一个爱好开源技术的人, 对PHP比较熟悉,也喜欢用PHP捣腾一些东西, 本博主要分享一些开源技术,其中包括但不限于Linux/PHP/Vim.">
+    <meta name="keywords" content="PHP, Linux, vim, 开源">
+    <meta name="author" content="coolnet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://blog.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://blog.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://blog.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://blog.me/theme/local.css" rel="stylesheet">
+    <link href="http://blog.me/theme/tag.css" rel="stylesheet">
+    <link href="http://blog.me/theme/pygments.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://blog.me">coolnet's world</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+        
+
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/lisp-xue-xi-bi-ji-bian-liang.html"><h2>Lisp 学习笔记----变量</h2></a>
+        <div class= "well small"> 三 20 三月 2013
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>概述</h2>
+<p>Common Lisp的变量是一些可以保存值的具名位置.Common Lisp支持两种类型的变量:<code>词法(lexical)变量</code>和<code>动态(dynamic)变量</code>分别对应其他语言中的<code>局部变量</code>和全局变量.<code>动态变量</code>有时也被成为<code>特殊变量</code>.Common Lisp中所有值都是对像的引用, 如果一个变量保存了对一个可变对象的应用,那么就可以用改引用来修改此对象(Python就借鉴于此)</p>
+<h3>LET</h3>
+<p>引入新变量的另一种方式就是使用<code>LET</code>操作符:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">(</span><span class="n">variable</span><span class="o">*</span><span class="p">)</span> <span class="n">body</span><span class="o">-</span><span class="n">form</span><span class="o">*</span><span class="p">)</span>
+</pre></div>
+
+
+<p>其中每一<code>variable</code>都是一个变量初始化形式.每一个初始化要么是一个含有变量名的初值形式列表, 要么就是一个简单的变量名---变量被初始化为<code>NIL</code></p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">x</span> <span class="mi">10</span><span class="p">)</span> <span class="p">(</span><span class="n">y</span> <span class="mi">20</span><span class="p">)</span> <span class="n">z</span><span class="p">)</span>
+<span class="p">...)</span>
+</pre></div>
+
+
+<p>上面将会为所有的初始值形式求值,然后创建出新的绑定,并在形式体被执行之前这些绑定将初始化到适当的初始值上.在<code>LET</code>形式体中,变量名将引用新创建的绑定 ...</p> <a class="btn btn-info xsmall" href="http://blog.me/lisp-xue-xi-bi-ji-bian-liang.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/lisp-xue-xi-bi-ji-han-shu.html"><h2>Lisp 学习笔记--函数</h2></a>
+        <div class= "well small"> 三 20 三月 2013
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>定义</h2>
+<p>函数一般使用<code>DEFUN</code>宏来定义.下面是<code>DEFUN</code>的基本结构</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">defun</span> <span class="n">name</span> <span class="p">(</span><span class="n">parameter</span><span class="o">*</span><span class="p">)</span>
+  <span class="s">&quot;Optional documentation string&quot;</span>
+  <span class="n">body</span><span class="o">-</span><span class="n">form</span><span class="o">*</span><span class="p">)</span>
+</pre></div>
+
+
+<p>函数名可以是任何符号.函数的形参列表定义了一些变量, 用来保存函数在调用时所传递的实参.可以使用<code>DOCUMENTATION</code>函数来获取紧跟函数<code>形参</code>列表之后的<code>文档字符串</code>.最后函数主体可以有任意数量的Lisp表达式构成,并将会被依次求值,并返回最后一个值.也可以使用<code>RETURN-FROM</code>特殊操作符从函数任意位置返回</p>
+<h2>形参列表</h2>
+<p><code>形参列表</code>的基本用途是为了声明一些变量,用来接受传递给函数的实参.</p>
+<h3>必要形参</h3>
+<p>当<code>形参列表</code>是由变量名组成的简单列表时, 这些形参被成为<code>必要形参</code>.也就说调用函数时必须传递这些参数.</p>
+<h3>可选形参</h3>
+<p>在<code>必要形参</code>的名字之后放置符号<code>&amp;optional</code>,后接可选形参的名字:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">defun</span> <span class="n">foo</span> <span class="p">(</span><span class="n">a ...</span></pre></div> <a class="btn btn-info xsmall" href="http://blog.me/lisp-xue-xi-bi-ji-han-shu.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/lisp-xue-xi-bi-ji.html"><h2>Lisp 学习笔记</h2></a>
+        <div class= "well small"> 二 19 三月 2013
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>数据结构</h2>
+<h3>list</h3>
+<p>LIST 函数生成一个由其参数组成的列表</p>
+<div class="highlight"><pre><span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">list</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>plist</h3>
+<p>属性列表(Property List)可以将列表中的给定位置映射到纪录中的给定字段(相当于hash表, 但是并不是真正的hash表)</p>
+<div class="highlight"><pre><span class="n">CL</span><span class="o">-</span><span class="n">USER</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">list</span> <span class="o">:</span><span class="n">a</span> <span class="mi">1</span> <span class="o">:</span><span class="n">b</span> <span class="mi">2</span> <span class="o">:</span><span class="n">c</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">(</span><span class="o">:</span><span class="n">A</span> <span class="mi">1</span> <span class="o">:</span><span class="n">B</span> <span class="mi">2</span> <span class="o">:</span><span class="n">C</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+
+<p>plist 和使用创建普通列表的函数只是改变参数来实现</p>
+<h2>变量</h2>
+<h3>定义</h3>
+<p>Lisp使用<code>DEFVAR</code>宏来定义变量.如果定义全局变量需用<code>*</code>来命名, 比如:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">defvar</span> <span class="o">*</span><span class="n">db</span><span class="o">*</span> <span class="n">nil</span><span class="p">)</span> <span class="p">;</span> <span class="err">定义</span><span class="o">*</span><span class="n">db ...</span></pre></div> <a class="btn btn-info xsmall" href="http://blog.me/lisp-xue-xi-bi-ji.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/lispyu-fa-xue-xi-bi-ji.html"><h2>Lisp语法学习笔记</h2></a>
+        <div class= "well small"> 二 19 三月 2013
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><h2>特殊操作符</h2>
+<p>Common Lisp定义了一些特殊的操作符, 它们可以做到函数无法做到的事情</p>
+<h3>IF</h3>
+<p><code>IF</code>的规则相当简单: 求值第一个表达式.如果第一个表达式得到非<code>NIL</code>则求值第二个表达式并返回它的值否则返回第三个表达式的值或者没有第三个表达式的话返回<code>NIL</code></p>
+<div class="highlight"><pre><span class="p">(</span><span class="k">if</span> <span class="n">test</span><span class="o">-</span><span class="n">form</span> <span class="n">then</span><span class="o">-</span><span class="n">form</span> <span class="p">[</span> <span class="k">else</span><span class="o">-</span><span class="n">form</span> <span class="p">])</span>
+</pre></div>
+
+
+<h3>QUOTE</h3>
+<p><code>QUOTE</code>接受一个单衣表达式作为其<code>参数</code>并简单的返回它:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">quote</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">))</span>  <span class="o">--&gt;</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+
+<p>同时可以用下面的方式简写上面的表达式</p>
+<div class="highlight"><pre><span class="err">&#39;</span><span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>      <span class="o">--&gt;</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>LET</h3>
+<p><code>LET</code>用来创建新的变量绑定</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">x</span> <span class="mi">10</span><span class="p">))</span> <span class="n">x</span><span class="p">)</span>  <span class="o">--&gt;</span> <span class="mi">10</span>
+</pre></div>
+
+
+<h2>真假和等价</h2>
+<p>符号<code>NIL</code>是唯一的假值,其他所有都是真值.<code>NIL</code>是唯一一个及时原子有是列表的对象:除了用来表示真假外 ...</p> <a class="btn btn-info xsmall" href="http://blog.me/lispyu-fa-xue-xi-bi-ji.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/filename_metadata-example.html"><h2>FILENAME_METADATA example</h2></a>
+        <div class= "well small"> 五 30 十一月 2012
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>Some cool stuff!</p>
+ <a class="btn btn-info xsmall" href="http://blog.me/filename_metadata-example.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/centosxia-da-jian-python-websheng-chan-huan-jing-nginxwebpyuwsgi.html"><h2>CentOS下搭建python web生产环境(nginx+web.py+uwsgi)</h2></a>
+        <div class= "well small"> 四 19 四月 2012
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>前面都一篇文章介绍介绍了Ubuntu下web.py的开发环境搭建,这篇文章主要来介绍如何让web.py结合nginx来实现生产环境</p>
+<p>首先使用环境介绍:
+系统: CentOS 5.5 32位</p>
+<p>Python版本:2.7.2</p>
+<p>nginx:1.0.13</p>
+<p>ip:192.168.3.3/24</p>
+<p>由于CentOS默认自带都python(2.4.3)版本较低,所以我们采用手动编译安装python的方式来使用python 2.7.2</p>
+<p>首先安装python 2.7.2</p>
+<div class="highlight"><pre><span class="n">cd</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">src</span><span class="o">/</span>
+<span class="n">mkdir</span> <span class="n">python</span>
+<span class="n">cd</span> <span class="n">python</span>
+<span class="cp">#下载python2.7.2</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//www ...</span></pre></div> <a class="btn btn-info xsmall" href="http://blog.me/centosxia-da-jian-python-websheng-chan-huan-jing-nginxwebpyuwsgi.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/second-article-en.html"><h2>Second article</h2></a>
+        <div class= "well small"> 三 29 二月 2012
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+        <a href="http://blog.me/second-article-en.html" class="btn btn-info xsmall">en</a>
+            <a href="http://blog.me/second-article-fr.html" class="btn btn-info xsmall">fr</a>&nbsp;
+ 
+
+
+ </div>
+        <div class="summary"><p>This is some article, in english</p>
+ <a class="btn btn-info xsmall" href="http://blog.me/second-article-en.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/a-markdown-powered-article.html"><h2>A markdown powered article</h2></a>
+        <div class= "well small"> 三 20 四月 2011
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>You're mutually oblivious.</p>
+<p><a href="|filename|/unbelievable.rst">a root-relative link to unbelievable</a>
+<a href="http://blog.me/unbelievable.html">a file-relative link to unbelievable</a></p> <a class="btn btn-info xsmall" href="http://blog.me/a-markdown-powered-article.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/article-1.html"><h2>Article 1</h2></a>
+        <div class= "well small"> 四 17 二月 2011
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>Article 1</p>
+ <a class="btn btn-info xsmall" href="http://blog.me/article-1.html">read more</a></div>
+    </div>	
+				
+
+ 
+        
+
+ 
+
+    <div class='article'>
+        <a href="http://blog.me/article-2.html"><h2>Article 2</h2></a>
+        <div class= "well small"> 四 17 二月 2011
+
+by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
+ 
+
+
+ </div>
+        <div class="summary"><p>Article 2</p>
+ <a class="btn btn-info xsmall" href="http://blog.me/article-2.html">read more</a></div>
+    </div>	
+				
+<div class="pagination">
+<ul>
+    <li class="prev"><a href="http://blog.me/author/coolnet.html">&larr; Previous</a></li>
+
+    <li class=""><a href="http://blog.me/author/coolnet.html">1</a></li>
+    <li class="active"><a href="http://blog.me/author/coolnet2.html">2</a></li>
+    <li class=""><a href="http://blog.me/author/coolnet3.html">3</a></li>
+
+    <li class="next"><a href="http://blog.me/author/coolnet3.html">Next &rarr;</a></li>
+
+</ul>
+</div>
+ 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="http://blog.me/archives.html">Archives</a>
+                <li><a href="http://blog.me/tags.html">Tags</a>
+                <li><a href="http://blog.me/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="http://blog.me/category/bar.html">bar</a></li>
+                <li><a href="http://blog.me/category/cat1.html">cat1</a></li>
+                <li><a href="http://blog.me/category/content.html">content</a></li>
+                <li><a href="http://blog.me/category/han-shu.html">函数</a></li>
+                <li><a href="http://blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://blog.me/category/lisp.html">Lisp</a></li>
+                <li><a href="http://blog.me/category/test_data.html">test_data</a></li>
+                <li><a href="http://blog.me/category/yeah.html">yeah</a></li>
+                   
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                <li><a href="http://eleveni386.7axu.com">eleven</a></li>
+                <li><a href="http://neteue.com">小邪兽_deepin</a></li>
+                <li><a href="http://frantic1048.com/">Frantic1048</a></li>
+                <li><a href="http://www.dongxf.com/">晓风'Blog</a></li>
+            </ul>
+            </div>
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://blog.me">coolnet's world</a> &copy; coolnet 2013
+    <script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>
+</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<a href="https://github.com/batcom/coldnight.github.com"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

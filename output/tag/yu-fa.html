@@ -38,9 +38,6 @@
         <div class="nav-collapse">
         <ul class="nav">
             
-            <li><a href="http://blog.me/pages/about.html">About</a></li>
-            <li><a href="http://blog.me/pages/jesus.html">Jesus</a></li>
-            <li><a href="http://blog.me/pages/site.html">Site</a></li>
         </ul>
         </div>
         
@@ -60,8 +57,8 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href="http://blog.me/ge-ren-jing-tai-blogde-da-jian.html"><h1>个人静态Blog的搭建</h1></a>
-一 20 一月 2014
+            <a href="http://blog.me/lispyu-fa-xue-xi-bi-ji.html"><h1>Lisp语法学习笔记</h1></a>
+二 19 三月 2013
 
 by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
  
@@ -70,28 +67,40 @@ by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
  
         </div>
         
-        <div><h2>简介</h2>
-<p>本<code>blog</code>采用的是<code>markdown</code>语法书写，基于<code>Vim</code>编辑，使用<code>pelican</code>静态部署，页面布局借用<code>bootstrap</code>主题，主要用来书写个人知识系统。</p>
-<h2>搭建过程</h2>
-<ul>
-<li>克隆本<code>blog</code>: </li>
-</ul>
-<div class="highlight"><pre><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/batcom/blog.git</span>
+        <div><h2>特殊操作符</h2>
+<p>Common Lisp定义了一些特殊的操作符, 它们可以做到函数无法做到的事情</p>
+<h3>IF</h3>
+<p><code>IF</code>的规则相当简单: 求值第一个表达式.如果第一个表达式得到非<code>NIL</code>则求值第二个表达式并返回它的值否则返回第三个表达式的值或者没有第三个表达式的话返回<code>NIL</code></p>
+<div class="highlight"><pre><span class="p">(</span><span class="k">if</span> <span class="n">test</span><span class="o">-</span><span class="n">form</span> <span class="n">then</span><span class="o">-</span><span class="n">form</span> <span class="p">[</span> <span class="k">else</span><span class="o">-</span><span class="n">form</span> <span class="p">])</span>
 </pre></div>
 
 
-<ul>
-<li>安装<code>pelican</code>:<ul>
-<li>安装<code>python</code> :</li>
-</ul>
-</li>
-</ul>
-<div class="highlight"><pre>         <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">python</span>
+<h3>QUOTE</h3>
+<p><code>QUOTE</code>接受一个单衣表达式作为其<code>参数</code>并简单的返回它:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">quote</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">))</span>  <span class="o">--&gt;</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
 
-<div class="highlight"><pre><span class="o">*</span>    <span class="n">anzdd</span><span class="o">:</span>
-</pre></div></div>
+<p>同时可以用下面的方式简写上面的表达式</p>
+<div class="highlight"><pre><span class="err">&#39;</span><span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>      <span class="o">--&gt;</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>LET</h3>
+<p><code>LET</code>用来创建新的变量绑定</p>
+<div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">x</span> <span class="mi">10</span><span class="p">))</span> <span class="n">x</span><span class="p">)</span>  <span class="o">--&gt;</span> <span class="mi">10</span>
+</pre></div>
+
+
+<h2>真假和等价</h2>
+<p>符号<code>NIL</code>是唯一的假值,其他所有都是真值.<code>NIL</code>是唯一一个及时原子有是列表的对象:除了用来表示真假外,还用来表示空列表</p>
+<h3>等价</h3>
+<ul>
+<li>EQ用来测试"对象标识", 只有当两个对象相同时才是<code>EQ</code>等价(不应该将EQ用于比较可能是数字或字符的值上)</li>
+<li><code>EQL</code>用来获得与<code>EQ</code>相似的行为,并且可以保证当相同类型的两个对象相同数字或字符值时它们是等价的</li>
+<li><code>EQUAL</code> 相比于<code>EQL</code>的宽松之处在于,它将在递归上具有相同结构和内容的列表视为等价,同时也认为含有相同字符的字符串是等价的</li>
+<li><code>EQUALP</code>甚至更加宽松之外, 它和<code>EQUAL</code>是相似的.比较字符串时呼略大小写</li>
+</ul></div>
         <hr />
     </div>
 		
@@ -99,7 +108,7 @@ by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
 
-    <li class="active"><a href="http://blog.me/tag/wiki.html">1</a></li>
+    <li class="active"><a href="http://blog.me/tag/yu-fa.html">1</a></li>
 
     <li class="next disabled"><a href="#">&rarr; Next</a></li>
 
@@ -130,7 +139,14 @@ by <a class="url fn" href="http://blog.me/author/coolnet.html">coolnet</a>
                 Categories
                 </li>
                 
+                <li><a href="http://blog.me/category/bar.html">bar</a></li>
+                <li><a href="http://blog.me/category/cat1.html">cat1</a></li>
+                <li><a href="http://blog.me/category/content.html">content</a></li>
+                <li><a href="http://blog.me/category/han-shu.html">函数</a></li>
                 <li><a href="http://blog.me/category/linux.html">Linux</a></li>
+                <li><a href="http://blog.me/category/lisp.html">Lisp</a></li>
+                <li><a href="http://blog.me/category/test_data.html">test_data</a></li>
+                <li><a href="http://blog.me/category/yeah.html">yeah</a></li>
                    
             </ul>
             </div>
