@@ -1,0 +1,38 @@
+%title Mysql5.5.28的配置与安装
+==Mysql5.5.28的配置与安装==
+这里只会单单讲解Mysql的编译安装，版本号为5.5.28，其它版本也可参考，但不确保能通过，并且定义mysql的安装目录为`/usr/local/mysql`、mysql的数据目录即data目录为`/data/mysql`.
+===添加用户、组和目录结构===
+{{{class="brush :bash"
+groupadd mysql
+useradd -g mysql mysql -s /bin/false
+mkdir -p /data/mysql
+chown -R mysql:mysql /data/mysql
+mkdir -p /usr/local/mysql
+    }}}
+===编译安装和安装脚本说明===
+{{{class="brush :bash"
+cd /usr/local/src
+tar zxvf mysql-5.5.28.tar.gz
+cd mysql-5.5.28
+cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql  -DMYSQL_DATADIR=/data/mysql  -DSYSCONFDIR=/etc 
+make
+make install
+rm -rf /etc/my.cnf #删除系统默认的配置文件
+cd /usr/local/mysql
+./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql    #初始化mysql系统数据库
+ln -s /usr/local/mysql/my.cnf /etc/my.cnf   #建立mysql配置文件软链接，此配置文件在哪找，去看概览
+cp ./support-files/mysql.server  /etc/rc.d/init.d/mysqld    #添加开机启动脚本
+chmod 755 /etc/init.d/mysqld
+chkconfig mysqld on     #开机自动启动
+echo 'basedir=/usr/local/mysql/' >> /etc/rc.d/init.d/mysqld
+echo 'datadir=/data/mysql/' >>/etc/rc.d/init.d/mysqld
+service mysqld start
+echo 'export PATH=$PATH:/usr/local/mysql/bin' >> /etc/profile
+ln -s /usr/local/mysql/lib/mysql /usr/lib/mysql
+ln -s /usr/local/mysql/include/mysql /usr/include/mysql
+mkdir /var/lib/mysql
+ln -s /tmp/mysql.sock  /var/lib/mysql/mysql.sock
+    }}}
+----
+至此，mysql的安装就完成了，还是很简单的，后期如果有什么好的sql语句也可以在这里搜集起来学习。相关的维护文档也可以放在这里，安装就这样就可以了。
+----

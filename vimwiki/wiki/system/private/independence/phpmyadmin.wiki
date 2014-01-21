@@ -1,0 +1,31 @@
+%title phpMyadmin的安装与配置
+==phpMyadmin的安装与配置==
+===安装===
+安装肯定需要有php环境。一般搭建好php环境后，添加一个虚拟主机，然后下载phpmyadmin.tar.gz安装包，将包解压至该虚拟主机指定的目录。访问即可。
+----
+===配置===
+该篇主要想介绍的是如何将phpmyadmin当作客户端来连接多个mysql服务器来进行管理。比如有localhost装了一个mysql，192.168.1.200也装了个mysql，远程服务器也装了mysql，我如何能通过phpmyadmin同时管理这些mysql呢?
+# 一般使用phpmyadmin会先将`libraries`里面的`config.default.php`mv到根目录下的命名为`config.inc.php`，该然后修改该文件中的`$cfg['Servers'][$i]['user'] = 'root';`等就可连接该Mysql实例。但这是能连接一个。我们只要懂一点php的人都知道，只要我们改变这里的$i只即可添加多个服务器配置了。
+# 多个mysql配置方案:修改`config.inc.php`找到544行
+{{{class="brush :php"
+$cfg['Servers'][$i]['StatusCacheLifetime'] = 0;     //544找到这行即可，在下面添加，有多个还可以添加3
+  $cfg['Servers']['2'] = $cfg['Servers'][$i];
+  $cfg['Servers']['2']['host'] = '192.168.1.200';
+  $cfg['Servers']['2']['user'] = 'test';
+  $cfg['Servers']['2']['password'] = 'test';
+/**
+ * Default server (0 = no default server)
+ *
+ * If you have more than one server configured, you can set $cfg['ServerDefault']
+ * to any one of them to auto-connect to that server when phpMyAdmin is started,
+ * or set it to 0 to be given a list of servers without logging in
+ * If you have only one server configured, $cfg['ServerDefault'] *MUST* be
+ * set to that server.
+ *
+ * @global integer $cfg['ServerDefault']
+ */
+$cfg['ServerDefault'] = 2;      //这里可以设置默认登录的服务器，如果在这里指定了就不会出现登录窗口了。
+
+    }}}
+如此配置后在phpmyadmin登录界面会出现一个下拉列表供你选择，但如果配置了上面的ServerDefault就不会出现了。
+----

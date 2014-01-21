@@ -1,0 +1,32 @@
+%title Bind9的安装与配置
+==Bind9的安装与配置==
+这里主要介绍的是在个人开发环境中涉及到本地、测试、生产这三个环境下关于*.mdaxue.com切换问题的解决方案。
+
+因为这里设计到多个域名的管理，所以必须用到DNS服务器，然后涉及到不同环境下的DNS解析与切换，这里就需要一个脚本来管理。
+
+因为是做Web开发所以还涉及到浏览器对网页DNS解析缓存的问题。
+
+最终要解决的问题就是：可以很方便的在这三个环境中切换，访问不同ip上的项目，并能在浏览器中实时看到最新的效果。
+
+----
+===Bind9的安装与配置===
+# `安装`：这里的Dns服务器选择的是bind,安装很简单`apt-get install bind9`即可搞定。
+# `配置`:
+    # 关闭`NetworkManager`，防止`NetworkManager`每次都会重写下一步中的DNS解析服务配置。`sudo service network-manager stop`,并且要查看是否开机自动启动，如果有需要关闭，具体如何详细关闭`NetworkManager`可以google。
+    # 修改`/etc/resolv.conf`，添加`nameserver 127.0.0.1`到首行。
+    # 为了减少配置的麻烦性，我直接将所有的bind配置文件都打包到概览里面约定的`Packages/etc/bind-conf.tar.gz`中了，安装好bind后直接解压到`/etc/bind/`目录进行覆盖,然后`service bind9 reload`即可。
+----
+===不同环境下的DNS解析与切换===
+# 因为存在本地、测试、生产这三个环境，每一个环境下*.mdaxue.com对应的ip地址都可能不一样。为了方便这三个环境的切换而写了一个简单的脚本，放在`Packages/etc/switchdns`中
+# 将该文件放到`/etc/init.d/switchdns`中，添加执行权限`chmod a+x /etc/init.d/switchdns`
+# 使用方法可以直接执行`sudo service swithcdns`,会回显`Usage:switchdns local|test|online|status`，这里`local`代表本地,`test`代表测试服务器,`online代表生产环境`,`status`查看当前是什么环境。
+# 上述参数，即环境对应的bind解析DNS文件分别是:
+    - `local`->`/etc/bind/db.local`
+    - `test`->`/etc/bind/db.test`
+    - `online`->`/etc/bind/db.mdaxue.com`
+你可以在相应环境下，在对应文件里面配置对应域名的ip解析，然后`sudo service switchdns local`切换到对应环境，这里演示的是`local`
+----
+===关于浏览器缓存的问题===
+因为我们可能随时都会切换环境，这样会导致我们在终端可能已经配置解析好了，ping的时候也发现ip指向的是正确的ip，但是浏览器却访问的不是正确的服务器，这是由于浏览器有DNS缓存机制导致的。我们可以安装`DNS Cache`解决这个问题。这是一个火狐插件，chrome下大家可以找类似的插件。
+----
+

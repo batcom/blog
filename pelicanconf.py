@@ -24,7 +24,7 @@ ARCHIVES_URL = "archives.html"
 
 GITHUB_URL = u"https://github.com/batcom/coldnight.github.com"
 
-FLOW_CONTENT = u"""<script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>"""
+#FLOW_CONTENT = u"""<script src="http://s96.cnzz.com/stat.php?id=3767683&web_id=3767683&show=pic" language="JavaScript"></script>"""
 
 STATIC_PATHS = [u"static/upload",
                 "extra/robots.txt",
@@ -40,10 +40,7 @@ EXTRA_PATH_METADATA = {
     "extra/404.html": {"path":"404.html"},
 }
 # Blogroll
-LINKS =  (('eleven', 'http://eleveni386.7axu.com'),
-          (u'小邪兽_deepin',"http://neteue.com"),
-          (u'Frantic1048', "http://frantic1048.com/"),
-          (u"晓风'Blog", "http://www.dongxf.com/"),
+LINKS =  (('google', 'http://google.com.hk'),
           )
 
 # Social widget

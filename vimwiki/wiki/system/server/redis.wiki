@@ -1,0 +1,82 @@
+%title Redis2.6.13的配置与安装
+==Redis2.6.13的配置与安装==
+===Redis的编译安装===
+安装很简单，直接上代码
+{{{class="brush :bash"
+tar -zxvf redis-stable.tar.gz
+cd redis-stable
+make && make test && make install
+    }}}
+----
+===设置开机启动===
+{{{class="brush :bash"
+#!/bin/sh
+#
+# redis        Startup script for Redis Server
+#
+# chkconfig: - 90 10
+# description: Redis is an open source, advanced key-value store. 
+#
+# processname: redis-server
+# config: /etc/redis.conf
+# pidfile: /var/run/redis.pid
+
+REDISPORT=6379
+EXEC=/usr/local/bin/redis-server
+REDIS_CLI=/usr/local/bin/redis-cli
+ 
+PIDFILE=/var/run/redis.pid
+CONF="/etc/redis.conf"
+ 
+case "$1" in
+    start)
+        if [ -f $PIDFILE ]
+        then
+                echo "$PIDFILE exists, process is already running or crashed"
+        else
+                echo "Starting Redis server..."
+                $EXEC $CONF
+        fi
+        if [ "$?"="0" ] 
+        then 
+              echo "Redis is running..."
+        fi 
+        ;;
+    stop)
+        if [ ! -f $PIDFILE ]
+        then
+                echo "$PIDFILE does not exist, process is not running"
+        else
+                PID=$(cat $PIDFILE)
+                echo "Stopping ..."
+                $REDIS_CLI -p $REDISPORT SHUTDOWN
+                while [ -x ${PIDFILE} ]
+               do
+                    echo "Waiting for Redis to shutdown ..."
+                    sleep 1
+                done
+                echo "Redis stopped"
+        fi
+        ;;
+   restart|force-reload)
+        ${0} stop
+        ${0} start
+        ;;
+  *)
+    echo "Usage: /etc/init.d/redis {start|stop|restart|force-reload}" >&2
+        exit 1
+esac
+    }}}
+----
+把上述代码存为`redis`,放到`/etc/init.d/`下面的redis,`chmod +x ／etc/init.d/redis`
+其实做成服务启动，也是调用redis-server，如果想让它在后台作为`daemon`运行，那么需要修改`redis.conf`,将 `daemonize no` 改为 `daemonize yes`
+`chkconfig --add redis`
+`chkconfig redis on`
+启动：
+`service redis start`   或者 `/etc/init.d/redis start`
+停止：
+`service redis stop`   或者 `/etc/init.d/redis stop`
+----
+===Redis配置文件详解===
+因为生产服务器上面没有怎么运用Redis的高级功能，如负载均衡等，所以并不需要怎么复杂的配置，生产服务器上面也只是更改了一下上面提到的以后台来运行服务。如果后期架构需要，可以将生产上的配置详解增加到这里来，和生产上同步讲解.而此时写文档时，没作什么特殊说明，所以就不提配置文件的具体配置和解释了。
+----

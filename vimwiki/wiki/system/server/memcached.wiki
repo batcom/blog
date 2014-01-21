@@ -1,0 +1,46 @@
+%title  Memcached1.4.15的配置与安装 
+==Memcached1.4.15的配置与安装==
+因为memcached依赖与libevent，所以需要先安装依赖关系
+===libevent的安装===
+    # 判断系统是否安装了libevent:
+    {{{class="brush :bash"
+    rpm -qa | grep libevent
+    ###一般默认都有安装，输出:libevent-1.4.13-4.el6.x86_64
+    rpm -e --nodeps libevent-1.4.13-4.el6.x86_64 ##########（删除低版本，安装2.0.21）
+    }}}
+    # 安装libevent
+    {{{class="brush :bash"
+    tar xvzf libevent-2.0.21-stable.tar.gz
+    cd libevent-2.0.21-stable
+    ./configure  -prefix=/usr
+    make && make install
+    ldconfig
+    ls -a /usr/lib | grep libevent ####(测试是否安装上)
+        }}}
+----
+===安装memcached===
+{{{class="brush :bash"
+    tar xvzf memcached-1.4.5.tar.gz
+    cd memcached-1.4.5
+    ./configure -with-libevent=/usr     ###（默认安装/usr/local/bin/memcached）
+    make && make install
+    }}}
+----
+===memcached的启动和配置解析===
+安装完成后即可启动memcached，启动方式在`概览`里面有详细说明。这里也详细解释一下。
+# 启动方式: `/usr/local/bin/memcached -d -m 10 -u root -l 192.168.0.200 -p 12000 -c 256 -P /tmp/memcached.pid`
+# memcached参数的详细说明:
+    * -d选项是启动一个守护进程，
+    * -u是运行Memcache的用户，我这里是root，
+    * -m是分配给Memcache使用的内存数量，单位是MB，默认64MB, 我这里是10MB，
+    * -l是监听的服务器IP地址，默认为所有网卡。 我这里指定了服务器的IP地址192.168.0.200
+    * -p是设置Memcache监听的端口，我这里设置了12000，最好是1024以上的端口
+    * -c选项是最大运行的并发连接数，默认是1024，我这里设置了256，按照你服务器的负载量来设定
+    * -P是设置保存Memcache的pid文件，我这里是保存在 /tmp/memcached.pid
+    * -p 使用的TCP端口。默认为11211
+    * -m 最大内存大小。默认为64M
+    * -vv 用very vrebose模式启动，调试信息和错误输出到控制台
+    * -d 作为daemon在后台启动
+# 如果要结束Memcache进程，执行：kill #cat /tmp/memcached.pid# #换为反引号即数字键1左边的
+可以启动多个守护进程，不过端口不能重复，启动后要防火墙要开启对应端口，只允许内网信任机器访问。生产服务器上的memcached的部署情况可以参看概览。
+----
